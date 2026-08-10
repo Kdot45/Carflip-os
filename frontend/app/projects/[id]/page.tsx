@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { AuthGuard } from "@/components/nav/AuthGuard";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { DealSummaryCard } from "@/components/deal/DealSummaryCard";
@@ -123,10 +123,11 @@ function ProjectDetailContent({ id }: { id: string }) {
   );
 }
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   return (
     <AuthGuard>
-      <ProjectDetailContent id={params.id} />
+      <ProjectDetailContent id={id} />
     </AuthGuard>
   );
 }

@@ -1,0 +1,42 @@
+databases:
+  - name: carflip-os-db
+    databaseName: carflip_os
+    user: carflip_os
+    plan: free
+
+services:
+  - type: web
+    name: carflip-os-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma migrate deploy && npm run start
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: carflip-os-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: PORT
+        value: 4000
+      # Update this once the frontend is deployed to Vercel — it should be
+      # the exact frontend origin (e.g. https://carflip-os.vercel.app), not
+      # a wildcard, since the API is called with an Authorization header.
+      - key: CORS_ORIGIN
+        value: http://localhost:3000
+      # Secrets aren't stored in this file. Render will prompt for this value
+      # when the blueprint is applied, or set it manually afterward in the
+      # service's Environment tab.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-4-5
+      # Ephemeral by design for now — no persistent disk is attached, so
+      # uploaded photos are lost on every redeploy/restart. See docs/README.md.
+      - key: UPLOAD_DIR
+        value: ./uploads

@@ -1,0 +1,242 @@
+// CarFlip OS — Prisma schema
+// Postgres in production (Supabase-compatible). SQLite works for quick local
+// prototyping if you swap the datasource provider below.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  flipper
+  dealer
+}
+
+enum ProjectStatus {
+  lead
+  bought
+  repairing
+  listed
+  sold
+  abandoned
+}
+
+enum TitleStatus {
+  clean
+  salvage
+  rebuilt
+  other
+}
+
+enum PhotoType {
+  exterior
+  engine
+  dash
+  tires
+  underside
+  other
+}
+
+enum EstimateSource {
+  ai
+  user
+  mixed
+}
+
+enum Confidence {
+  low
+  medium
+  high
+}
+
+enum LineItemCategory {
+  mechanical
+  body
+  electrical
+  tires
+  other
+}
+
+enum Severity {
+  safety
+  required
+  cosmetic
+}
+
+enum AiPurpose {
+  triage
+  estimate
+  chat
+}
+
+model User {
+  id                            String   @id @default(uuid())
+  email                         String   @unique
+  passwordHash                  String   @map("password_hash")
+  name                          String
+  homeZip                       String   @map("home_zip")
+  role                          UserRole @default(flipper)
+  defaultLaborRateMechanical    Decimal  @default(75) @map("default_labor_rate_mechanical") @db.Decimal(10, 2)
+  defaultLaborRateBody          Decimal  @default(65) @map("default_labor_rate_body") @db.Decimal(10, 2)
+  defaultContingencyPct         Decimal  @default(15) @map("default_contingency_pct") @db.Decimal(5, 2)
+  defaultMarginPct              Decimal  @default(20) @map("default_margin_pct") @db.Decimal(5, 2)
+  createdAt                     DateTime @default(now()) @map("created_at")
+  updatedAt                     DateTime @updatedAt @map("updated_at")
+
+  projects Project[]
+
+  @@map("users")
+}
+
+model Project {
+  id                  String        @id @default(uuid())
+  userId              String        @map("user_id")
+  status              ProjectStatus @default(lead)
+  vin                 String?
+  year                Int
+  make                String
+  model               String
+  trim                String?
+  miles               Int
+  titleStatus         TitleStatus   @default(clean) @map("title_status")
+  askingPrice         Decimal       @map("asking_price") @db.Decimal(10, 2)
+  purchasePrice        Decimal?      @map("purchase_price") @db.Decimal(10, 2)
+  zipForDeal          String        @map("zip_for_deal")
+  listingUrl          String?       @map("listing_url")
+  listingNotesText    String?       @map("listing_notes_text")
+  expectedResalePrice Decimal?      @map("expected_resale_price") @db.Decimal(10, 2)
+  sellingCosts        Decimal       @default(0) @map("selling_costs") @db.Decimal(10, 2)
+  targetProfitAmount  Decimal?      @map("target_profit_amount") @db.Decimal(10, 2)
+  targetMarginPct     Decimal?      @map("target_margin_pct") @db.Decimal(5, 2)
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos         ProjectPhoto[]
+  obdReadings    ObdReading[]
+  estimates      RepairEstimate[]
+  receipts       Receipt[]
+  checklistItems ChecklistItem[]
+  aiRuns         AiRun[]
+
+  @@index([userId])
+  @@map("projects")
+}
+
+model ProjectPhoto {
+  id          String    @id @default(uuid())
+  projectId   String    @map("project_id")
+  type        PhotoType @default(other)
+  storagePath String    @map("storage_path")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_photos")
+}
+
+model ObdReading {
+  id            String   @id @default(uuid())
+  projectId     String   @map("project_id")
+  rawCodesText  String   @map("raw_codes_text")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("obd_readings")
+}
+
+model RepairEstimate {
+  id                String         @id @default(uuid())
+  projectId         String         @map("project_id")
+  source            EstimateSource @default(user)
+  confidence        Confidence     @default(medium)
+  partsTotal        Decimal        @default(0) @map("parts_total") @db.Decimal(10, 2)
+  laborTotal        Decimal        @default(0) @map("labor_total") @db.Decimal(10, 2)
+  diagnosticsTotal  Decimal        @default(0) @map("diagnostics_total") @db.Decimal(10, 2)
+  consumablesTotal  Decimal        @default(0) @map("consumables_total") @db.Decimal(10, 2)
+  feesTotal         Decimal        @default(0) @map("fees_total") @db.Decimal(10, 2)
+  contingencyPct    Decimal        @default(15) @map("contingency_pct") @db.Decimal(5, 2)
+  contingencyTotal  Decimal        @default(0) @map("contingency_total") @db.Decimal(10, 2)
+  totalLow          Decimal        @default(0) @map("total_low") @db.Decimal(10, 2)
+  totalExpected     Decimal        @default(0) @map("total_expected") @db.Decimal(10, 2)
+  totalWorst        Decimal        @default(0) @map("total_worst") @db.Decimal(10, 2)
+  suggestedMaxBid   Decimal?       @map("suggested_max_bid") @db.Decimal(10, 2)
+  assumptionsJson   Json?          @map("assumptions_json")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  project    Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  lineItems  RepairLineItem[]
+
+  @@index([projectId])
+  @@map("repair_estimates")
+}
+
+model RepairLineItem {
+  id          String            @id @default(uuid())
+  estimateId  String            @map("estimate_id")
+  category    LineItemCategory  @default(mechanical)
+  title       String
+  description String?
+  severity    Severity          @default(required)
+  partsCost   Decimal           @default(0) @map("parts_cost") @db.Decimal(10, 2)
+  laborHours  Decimal           @default(0) @map("labor_hours") @db.Decimal(6, 2)
+  laborRate   Decimal           @default(0) @map("labor_rate") @db.Decimal(10, 2)
+  diyOk       Boolean           @default(false) @map("diy_ok")
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  estimate RepairEstimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+
+  @@index([estimateId])
+  @@map("repair_line_items")
+}
+
+model Receipt {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  amount      Decimal  @db.Decimal(10, 2)
+  description String
+  date        DateTime
+  photoUrl    String?  @map("photo_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("receipts")
+}
+
+model ChecklistItem {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  text      String
+  done      Boolean  @default(false)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("checklist_items")
+}
+
+model AiRun {
+  id            String    @id @default(uuid())
+  projectId     String    @map("project_id")
+  purpose       AiPurpose
+  inputSummary  String    @map("input_summary")
+  outputSummary String    @map("output_summary")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("ai_runs")
+}

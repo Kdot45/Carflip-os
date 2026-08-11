@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { ApiRequestError } from "@/lib/api";
+import { playEngineStart } from "@/lib/sound";
 import { UserRole } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { Input, Label, Select, FieldError } from "@/components/ui/Input";
@@ -31,6 +32,7 @@ export default function SignupPage() {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
+    playEngineStart();
     try {
       await signup(form);
       router.push("/dashboard");
@@ -44,11 +46,11 @@ export default function SignupPage() {
   return (
     <div className="mx-auto flex min-h-[80vh] max-w-sm flex-col justify-center px-1 py-8">
       <div className="mb-8 text-center">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-500 text-lg font-bold text-white">
-          CF
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-ink-400 bg-gradient-to-b from-ink-600 to-ink-800 shadow-[inset_0_0_0_3px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,139,61,0.15)]">
+          <span className="font-mono text-sm font-extrabold text-accent-500">CF</span>
         </span>
-        <h1 className="mt-4 text-2xl font-semibold text-slate-900">Create your account</h1>
-        <p className="mt-1 text-sm text-slate-500">Evaluate deals before you buy, not after.</p>
+        <h1 className="mt-4 text-2xl font-semibold text-ink-50">Create your account</h1>
+        <p className="mt-1 text-sm text-ink-200">Evaluate deals before you buy, not after.</p>
       </div>
 
       <Card>
@@ -100,14 +102,14 @@ export default function SignupPage() {
           </div>
           <FieldError>{error}</FieldError>
           <Button type="submit" fullWidth disabled={isSubmitting}>
-            {isSubmitting ? "Creating account…" : "Create account"}
+            {isSubmitting ? "Starting up…" : "Create account"}
           </Button>
         </form>
       </Card>
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-ink-200">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-accent-600 hover:text-accent-700">
+        <Link href="/login" className="font-medium text-accent-500 hover:text-accent-400">
           Log in
         </Link>
       </p>

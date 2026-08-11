@@ -65,7 +65,7 @@ export function LineItemForm({
         e.preventDefault();
         onSubmit(values);
       }}
-      className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3"
+      className="space-y-3 rounded-xl border border-ink-500 bg-ink-700 p-3"
     >
       <div>
         <Label htmlFor="li-title">Title</Label>
@@ -132,7 +132,7 @@ export function LineItemForm({
           />
         </div>
       </div>
-      <label className="flex items-center gap-2 text-sm text-slate-700">
+      <label className="flex items-center gap-2 text-sm text-ink-100">
         <input type="checkbox" checked={values.diyOk} onChange={(e) => update("diyOk", e.target.checked)} />
         DIY-friendly (skip the shop for this one)
       </label>

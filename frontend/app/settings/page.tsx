@@ -54,7 +54,7 @@ function SettingsContent() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="mb-5 text-xl font-semibold text-slate-900">Settings</h1>
+      <h1 className="mb-5 text-xl font-semibold text-ink-50">Settings</h1>
 
       <Card>
         <CardHeader title="Profile" />
@@ -77,8 +77,8 @@ function SettingsContent() {
             </div>
           </div>
 
-          <div className="border-t border-slate-100 pt-4">
-            <h3 className="mb-3 text-sm font-semibold text-slate-700">Defaults for new deals</h3>
+          <div className="border-t border-ink-700 pt-4">
+            <h3 className="mb-3 text-sm font-semibold text-ink-100">Defaults for new deals</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="laborMech">Mechanical labor rate ($/hr)</Label>

@@ -52,7 +52,7 @@ export function PhotosSection({
         {PHOTO_TYPES.map((pt) => (
           <label
             key={pt.value}
-            className="cursor-pointer rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+            className="cursor-pointer rounded-full border border-ink-400 px-3 py-1.5 text-xs font-medium text-ink-100 hover:bg-ink-700"
           >
             {uploadingType === pt.value ? "Uploading…" : `+ ${pt.label}`}
             <input
@@ -72,7 +72,7 @@ export function PhotosSection({
       {photos.length > 0 && (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {photos.map((photo) => (
-            <div key={photo.id} className="group relative aspect-square overflow-hidden rounded-lg bg-slate-100">
+            <div key={photo.id} className="group relative aspect-square overflow-hidden rounded-lg bg-ink-700">
               {/* Uploaded content is user-provided image data of arbitrary origin, so
                   next/image's remote optimizer is skipped in favor of a plain <img>. */}
               <Image

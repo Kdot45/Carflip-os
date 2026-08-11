@@ -187,10 +187,10 @@ export function NewDealWizard() {
             <div
               className={clsx(
                 "h-1.5 w-full rounded-full",
-                i <= stepIndex ? "bg-accent-500" : "bg-slate-200"
+                i <= stepIndex ? "bg-accent-500" : "bg-ink-500"
               )}
             />
-            <span className={clsx("hidden text-[11px] sm:block", i === stepIndex ? "font-medium text-slate-900" : "text-slate-400")}>
+            <span className={clsx("hidden text-[11px] sm:block", i === stepIndex ? "font-medium text-ink-50" : "text-ink-300")}>
               {label}
             </span>
           </div>
@@ -198,7 +198,7 @@ export function NewDealWizard() {
       </div>
 
       <Card>
-        <h2 className="mb-4 text-base font-semibold text-slate-900 sm:hidden">{STEPS[stepIndex]}</h2>
+        <h2 className="mb-4 text-base font-semibold text-ink-50 sm:hidden">{STEPS[stepIndex]}</h2>
 
         {stepIndex === 0 && (
           <div>
@@ -210,19 +210,19 @@ export function NewDealWizard() {
               value={listingNotesText}
               onChange={(e) => setListingNotesText(e.target.value)}
             />
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-ink-300">
               AI will pull the year/make/model/price/mileage out of this and pre-fill the next two steps
               for you. Nothing here is ever sent to the listing site — this only reads text you paste in
               yourself.
             </p>
 
             <div className="my-4 flex items-center gap-3">
-              <div className="h-px flex-1 bg-slate-200" />
-              <span className="text-xs font-medium text-slate-400">OR</span>
-              <div className="h-px flex-1 bg-slate-200" />
+              <div className="h-px flex-1 bg-ink-500" />
+              <span className="text-xs font-medium text-ink-300">OR</span>
+              <div className="h-px flex-1 bg-ink-500" />
             </div>
 
-            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 px-4 py-3.5 text-sm font-medium text-accent-600 hover:bg-accent-50">
+            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-ink-400 px-4 py-3.5 text-sm font-medium text-accent-600 hover:bg-accent-50">
               {isExtracting ? "Reading screenshot…" : "📷 Upload a screenshot instead"}
               <input
                 type="file"
@@ -235,7 +235,7 @@ export function NewDealWizard() {
                 }}
               />
             </label>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-ink-300">
               Screenshot the listing on your own phone and upload it here — good for listings that are
               awkward to copy text from. Same rule applies: only the image you upload is read, nothing is
               fetched from any site.
@@ -337,10 +337,10 @@ export function NewDealWizard() {
 
         {stepIndex === 3 && (
           <div className="space-y-3">
-            <p className="text-sm text-slate-500">Optional, but photos make the repair estimate and AI triage much more useful.</p>
+            <p className="text-sm text-ink-300">Optional, but photos make the repair estimate and AI triage much more useful.</p>
             {PHOTO_TYPES.map((pt) => (
-              <div key={pt.value} className="flex items-center justify-between rounded-xl border border-slate-200 px-3 py-2.5">
-                <span className="text-sm font-medium text-slate-700">{pt.label}</span>
+              <div key={pt.value} className="flex items-center justify-between rounded-xl border border-ink-500 px-3 py-2.5">
+                <span className="text-sm font-medium text-ink-100">{pt.label}</span>
                 <label className="cursor-pointer text-sm font-medium text-accent-600">
                   Upload
                   <input

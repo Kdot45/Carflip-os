@@ -55,17 +55,17 @@ export function ChecklistSection({
               type="checkbox"
               checked={item.done}
               onChange={() => toggleDone(item)}
-              className="h-4 w-4 shrink-0 rounded border-slate-300 text-accent-500 focus:ring-accent-400"
+              className="h-4 w-4 shrink-0 rounded border-ink-400 text-accent-500 focus:ring-accent-400"
             />
-            <span className={clsx("flex-1 text-sm", item.done ? "text-slate-400 line-through" : "text-slate-800")}>
+            <span className={clsx("flex-1 text-sm", item.done ? "text-ink-300 line-through" : "text-ink-50")}>
               {item.text}
             </span>
-            <button onClick={() => deleteItem(item.id)} className="text-xs text-slate-400 hover:text-red-600">
+            <button onClick={() => deleteItem(item.id)} className="text-xs text-ink-300 hover:text-bad">
               Delete
             </button>
           </div>
         ))}
-        {items.length === 0 && <p className="text-sm text-slate-500">No tasks yet.</p>}
+        {items.length === 0 && <p className="text-sm text-ink-300">No tasks yet.</p>}
       </div>
 
       <form onSubmit={addItem} className="mt-3 flex gap-2">

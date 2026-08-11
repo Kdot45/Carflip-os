@@ -107,8 +107,8 @@ function ProjectDetailContent({ id }: { id: string }) {
 
       <BottomActionBar>
         <div className="flex-1">
-          <p className="text-[11px] text-slate-500">Suggested max bid</p>
-          <p className="text-base font-bold text-slate-900">{formatCurrency(maxBid?.suggestedMaxBid)}</p>
+          <p className="text-[11px] text-ink-300">Suggested max bid</p>
+          <p className="text-base font-bold text-ink-50">{formatCurrency(maxBid?.suggestedMaxBid)}</p>
         </div>
         <Button
           size="sm"

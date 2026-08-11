@@ -41,9 +41,9 @@ export function ObdSection({
       {readings.length > 0 && (
         <div className="mb-3 space-y-2">
           {readings.map((r) => (
-            <div key={r.id} className="rounded-lg bg-slate-50 p-2.5 text-sm">
-              <p className="font-mono text-slate-800">{r.rawCodesText}</p>
-              <p className="mt-0.5 text-xs text-slate-400">{formatDate(r.createdAt)}</p>
+            <div key={r.id} className="rounded-lg bg-ink-700 p-2.5 text-sm">
+              <p className="font-mono text-ink-50">{r.rawCodesText}</p>
+              <p className="mt-0.5 text-xs text-ink-300">{formatDate(r.createdAt)}</p>
             </div>
           ))}
         </div>

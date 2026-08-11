@@ -4,9 +4,9 @@ import { InputHTMLAttributes, forwardRef, TextareaHTMLAttributes, SelectHTMLAttr
 import clsx from "@/lib/clsx";
 
 const fieldClasses =
-  "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-base text-slate-900 " +
-  "placeholder:text-slate-400 focus:border-accent-500 focus:outline-none focus:ring-2 " +
-  "focus:ring-accent-100 disabled:bg-slate-50 disabled:text-slate-400";
+  "w-full rounded-xl border border-ink-500 bg-ink-900 px-3.5 py-2.5 text-base text-ink-50 font-mono " +
+  "placeholder:text-ink-300 placeholder:font-sans focus:border-accent-500 focus:outline-none focus:ring-2 " +
+  "focus:ring-accent-500/20 disabled:bg-ink-800 disabled:text-ink-300";
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   ({ className, ...props }, ref) => (
@@ -33,7 +33,7 @@ Select.displayName = "Select";
 
 export function Label({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {
   return (
-    <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-slate-700">
+    <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-ink-100">
       {children}
     </label>
   );
@@ -41,5 +41,5 @@ export function Label({ children, htmlFor }: { children: React.ReactNode; htmlFo
 
 export function FieldError({ children }: { children?: string | null }) {
   if (!children) return null;
-  return <p className="mt-1 text-sm text-red-600">{children}</p>;
+  return <p className="mt-1 text-sm text-bad">{children}</p>;
 }

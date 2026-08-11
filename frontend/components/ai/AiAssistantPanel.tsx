@@ -94,14 +94,14 @@ export function AiAssistantPanel({
     <Card>
       <CardHeader title="AI assistant" subtitle="Paste symptoms, ask questions, get triage suggestions." />
 
-      <div className="mb-3 flex gap-1 rounded-lg bg-slate-100 p-1">
+      <div className="mb-3 flex gap-1 rounded-lg bg-ink-700 p-1">
         {(["triage", "chat"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={clsx(
               "flex-1 rounded-md py-1.5 text-sm font-medium capitalize transition-colors",
-              tab === t ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"
+              tab === t ? "bg-ink-800 text-ink-50 shadow-sm" : "text-ink-300"
             )}
           >
             {t}
@@ -122,24 +122,24 @@ export function AiAssistantPanel({
           </Button>
 
           {triage && (
-            <div className="mt-4 rounded-xl border border-slate-200 p-3">
+            <div className="mt-4 rounded-xl border border-ink-500 p-3">
               <div className="mb-2 flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-700">Risk level:</span>
+                <span className="text-sm font-medium text-ink-100">Risk level:</span>
                 <Badge tone={RISK_TONE[triage.riskLevel]}>{triage.riskLevel}</Badge>
               </div>
-              <p className="text-sm text-slate-700">{triage.summary}</p>
+              <p className="text-sm text-ink-100">{triage.summary}</p>
               {triage.obdExplanation && (
-                <p className="mt-2 text-sm text-slate-600">
+                <p className="mt-2 text-sm text-ink-200">
                   <span className="font-medium">OBD codes: </span>
                   {triage.obdExplanation}
                 </p>
               )}
               {triage.suggestedLineItems.length > 0 && (
                 <div className="mt-3">
-                  <p className="mb-1 text-sm font-medium text-slate-700">Suggested repair items</p>
+                  <p className="mb-1 text-sm font-medium text-ink-100">Suggested repair items</p>
                   <ul className="space-y-1">
                     {triage.suggestedLineItems.map((item, i) => (
-                      <li key={i} className="text-sm text-slate-600">
+                      <li key={i} className="text-sm text-ink-200">
                         • {item.title} — ~${item.estimatedPartsCost} parts, {item.estimatedLaborHours}h labor
                       </li>
                     ))}
@@ -149,7 +149,7 @@ export function AiAssistantPanel({
                       {isAddingItems ? "Adding…" : "Add all to repair estimate"}
                     </Button>
                   ) : (
-                    <p className="mt-2 text-xs text-slate-500">Start a repair estimate to add these items.</p>
+                    <p className="mt-2 text-xs text-ink-300">Start a repair estimate to add these items.</p>
                   )}
                 </div>
               )}
@@ -165,14 +165,14 @@ export function AiAssistantPanel({
                 key={i}
                 className={clsx(
                   "max-w-[85%] rounded-xl px-3 py-2 text-sm",
-                  m.role === "user" ? "ml-auto bg-accent-500 text-white" : "bg-slate-100 text-slate-800"
+                  m.role === "user" ? "ml-auto bg-accent-500 text-white" : "bg-ink-700 text-ink-50"
                 )}
               >
                 {m.content}
               </div>
             ))}
             {messages.length === 0 && (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-ink-300">
                 Ask about this deal — e.g. &ldquo;Is a rebuilt title a dealbreaker here?&rdquo;
               </p>
             )}

@@ -57,24 +57,24 @@ export function ReceiptsSection({
 
       <div className="space-y-2">
         {receipts.map((r) => (
-          <div key={r.id} className="flex items-center justify-between border-b border-slate-100 py-2 last:border-0">
+          <div key={r.id} className="flex items-center justify-between border-b border-ink-700 py-2 last:border-0">
             <div>
-              <p className="text-sm font-medium text-slate-900">{r.description}</p>
-              <p className="text-xs text-slate-500">{formatDate(r.date)}</p>
+              <p className="text-sm font-medium text-ink-50">{r.description}</p>
+              <p className="text-xs text-ink-300">{formatDate(r.date)}</p>
             </div>
             <div className="flex items-center gap-3">
-              <p className="text-sm font-semibold text-slate-900">{formatCurrencyPrecise(r.amount)}</p>
-              <button onClick={() => deleteReceipt(r.id)} className="text-xs text-slate-400 hover:text-red-600">
+              <p className="text-sm font-semibold text-ink-50">{formatCurrencyPrecise(r.amount)}</p>
+              <button onClick={() => deleteReceipt(r.id)} className="text-xs text-ink-300 hover:text-bad">
                 Delete
               </button>
             </div>
           </div>
         ))}
-        {receipts.length === 0 && <p className="text-sm text-slate-500">No receipts yet.</p>}
+        {receipts.length === 0 && <p className="text-sm text-ink-300">No receipts yet.</p>}
       </div>
 
       {isAdding ? (
-        <form onSubmit={addReceipt} className="mt-3 space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <form onSubmit={addReceipt} className="mt-3 space-y-3 rounded-xl border border-ink-500 bg-ink-700 p-3">
           <div>
             <Label htmlFor="r-description">Description</Label>
             <Input

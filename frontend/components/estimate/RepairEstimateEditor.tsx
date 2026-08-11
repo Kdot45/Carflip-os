@@ -114,23 +114,25 @@ export function RepairEstimateEditor({
     <Card>
       <CardHeader title="Repair estimate" subtitle={`${estimate.lineItems.length} line item(s)`} />
 
-      <div className="grid grid-cols-3 gap-3 rounded-xl bg-slate-50 p-3 text-center sm:grid-cols-6">
-        <SummaryStat label="Parts" value={formatCurrencyPrecise(estimate.partsTotal)} />
-        <SummaryStat label="Labor" value={formatCurrencyPrecise(estimate.laborTotal)} />
-        <SummaryStat label="Diagnostics" value={formatCurrencyPrecise(estimate.diagnosticsTotal)} />
-        <SummaryStat label="Consumables" value={formatCurrencyPrecise(estimate.consumablesTotal)} />
-        <SummaryStat label="Fees" value={formatCurrencyPrecise(estimate.feesTotal)} />
-        <SummaryStat label={`Contingency ${estimate.contingencyPct}%`} value={formatCurrencyPrecise(estimate.contingencyTotal)} />
+      <div className="brushed relative rounded-xl border border-ink-500 bg-ink-800">
+        <div className="grid grid-cols-3 divide-y divide-ink-600 sm:grid-cols-6 sm:divide-x sm:divide-y-0">
+          <SummaryStat label="Parts" value={formatCurrencyPrecise(estimate.partsTotal)} />
+          <SummaryStat label="Labor" value={formatCurrencyPrecise(estimate.laborTotal)} />
+          <SummaryStat label="Diagnostics" value={formatCurrencyPrecise(estimate.diagnosticsTotal)} />
+          <SummaryStat label="Consumables" value={formatCurrencyPrecise(estimate.consumablesTotal)} />
+          <SummaryStat label="Fees" value={formatCurrencyPrecise(estimate.feesTotal)} />
+          <SummaryStat label={`Contingency ${estimate.contingencyPct}%`} value={formatCurrencyPrecise(estimate.contingencyTotal)} />
+        </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+      <div className="mt-3 grid grid-cols-3 divide-x divide-ink-600 rounded-xl border border-ink-500 bg-ink-800 text-center">
         <RangeStat label="Best case" value={formatCurrency(estimate.totalLow)} />
         <RangeStat label="Expected" value={formatCurrency(estimate.totalExpected)} highlight />
         <RangeStat label="Worst case" value={formatCurrency(estimate.totalWorst)} />
       </div>
 
-      <details className="mt-4 rounded-xl border border-slate-200 p-3">
-        <summary className="cursor-pointer text-sm font-medium text-slate-700">
+      <details className="mt-4 rounded-xl border border-ink-500 p-3">
+        <summary className="cursor-pointer text-sm font-medium text-ink-100">
           Edit diagnostics, consumables, fees & contingency %
         </summary>
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -199,7 +201,7 @@ export function RepairEstimateEditor({
           )
         )}
         {estimate.lineItems.length === 0 && !isAdding && (
-          <p className="py-3 text-sm text-slate-500">No line items yet. Add what this car needs.</p>
+          <p className="py-3 text-sm text-ink-300">No line items yet. Add what this car needs.</p>
         )}
       </div>
 
@@ -223,18 +225,20 @@ export function RepairEstimateEditor({
 
 function SummaryStat({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <p className="text-[11px] leading-tight text-slate-500">{label}</p>
-      <p className="text-sm font-semibold text-slate-900">{value}</p>
+    <div className="px-2 py-3 text-center">
+      <p className="font-mono text-[10px] uppercase tracking-wider text-ink-300">{label}</p>
+      <p className="mt-0.5 font-mono text-sm font-semibold text-ink-50">{value}</p>
     </div>
   );
 }
 
 function RangeStat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className={highlight ? "rounded-xl bg-accent-50 p-3" : "rounded-xl bg-slate-50 p-3"}>
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className={highlight ? "text-lg font-bold text-accent-700" : "text-lg font-bold text-slate-900"}>{value}</p>
+    <div className="p-3">
+      <p className="font-mono text-[10px] uppercase tracking-wider text-ink-300">{label}</p>
+      <p className={highlight ? "font-mono text-xl font-bold text-accent-500" : "font-mono text-xl font-bold text-ink-50"}>
+        {value}
+      </p>
     </div>
   );
 }

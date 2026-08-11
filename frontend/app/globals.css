@@ -4,9 +4,28 @@
 
 html,
 body {
-  background-color: #f8fafc;
+  background-color: #121316;
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Faint brushed-metal texture, used sparingly on panel surfaces. */
+.brushed {
+  background-image: repeating-linear-gradient(
+    107deg,
+    rgba(255, 255, 255, 0.035) 0px,
+    rgba(255, 255, 255, 0.035) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

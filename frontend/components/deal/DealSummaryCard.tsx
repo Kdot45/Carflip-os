@@ -79,7 +79,7 @@ export function DealSummaryCard({
             <Stat label="Title" value={project.titleStatus[0].toUpperCase() + project.titleStatus.slice(1)} />
           </div>
           <div className="mt-3 flex items-center justify-between">
-            <p className="text-sm text-slate-500">Location: {project.zipForDeal}</p>
+            <p className="text-sm text-ink-300">Location: {project.zipForDeal}</p>
             <button
               onClick={() => setIsEditing(true)}
               className="text-sm font-medium text-accent-600 hover:text-accent-700"
@@ -169,8 +169,8 @@ export function DealSummaryCard({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-sm font-semibold text-slate-900">{value}</p>
+      <p className="text-xs text-ink-300">{label}</p>
+      <p className="text-sm font-semibold text-ink-50">{value}</p>
     </div>
   );
 }

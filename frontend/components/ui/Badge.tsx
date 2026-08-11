@@ -9,16 +9,16 @@ export function Badge({
   tone?: "neutral" | "good" | "marginal" | "bad" | "accent";
 }) {
   const toneClasses: Record<string, string> = {
-    neutral: "bg-slate-100 text-slate-700",
-    good: "bg-emerald-50 text-good",
-    marginal: "bg-amber-50 text-marginal",
-    bad: "bg-red-50 text-bad",
-    accent: "bg-accent-50 text-accent-700",
+    neutral: "bg-ink-700 text-ink-200",
+    good: "bg-teal-500/10 text-good",
+    marginal: "bg-marginal/10 text-marginal",
+    bad: "bg-bad/10 text-bad",
+    accent: "bg-accent-500/10 text-accent-500",
   };
   return (
     <span
       className={clsx(
-        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium",
+        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono font-medium uppercase tracking-wide",
         toneClasses[tone]
       )}
     >

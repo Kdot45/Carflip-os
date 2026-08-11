@@ -10,6 +10,7 @@ import { projectChecklistRouter, checklistRouter } from "./routes/checklist.rout
 import { projectPhotosRouter, photosRouter } from "./routes/photos.routes";
 import { aiRouter, aiUtilityRouter } from "./routes/ai.routes";
 import { projectRecallsRouter } from "./routes/recalls.routes";
+import { obdCodesRouter } from "./routes/obd.routes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { ensureUploadDir } from "./lib/storage";
 
@@ -32,6 +33,7 @@ app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.use("/auth", authRouter);
 app.use("/ai", aiUtilityRouter);
+app.use("/obd-codes", obdCodesRouter);
 app.use("/projects", projectsRouter);
 
 // Nested, project-scoped resources.

@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { FEDERAL_CONSUMER_LAW_FACTS } from "./legalKnowledge";
+import { lookupObdCodes } from "./obdCodes";
 
 /**
  * AI is advisory only, everywhere in this app. Every response carries this
@@ -146,6 +147,17 @@ export async function runTriage(input: TriageInput): Promise<TriageResult> {
     return mockTriage(input);
   }
 
+  const obdLookups = input.obdCodes ? lookupObdCodes(input.obdCodes) : [];
+  const obdReference = obdLookups.length
+    ? obdLookups
+        .map((l) =>
+          l.found
+            ? `- ${l.code}: ${l.description} (${l.system})`
+            : `- ${l.code}: not in our generic-code reference — likely manufacturer-specific, needs a mechanic or make-specific scan tool to confirm`
+        )
+        .join("\n")
+    : null;
+
   const userPrompt = `Vehicle: ${input.vehicleDescription}
 
 Listing notes from the seller (pasted by the buyer):
@@ -153,7 +165,7 @@ ${input.listingNotes ?? "(none provided)"}
 
 OBD-II trouble codes reported:
 ${input.obdCodes ?? "(none provided)"}
-
+${obdReference ? `\nGround truth from our local generic-code reference table — use these definitions verbatim for obdExplanation, do not contradict or reinterpret them:\n${obdReference}\n` : ""}
 Symptoms described by the buyer:
 ${input.symptoms ?? "(none provided)"}
 

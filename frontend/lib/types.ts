@@ -184,6 +184,14 @@ export interface ChatResult {
   disclaimer: string;
 }
 
+export interface ObdCodeLookupResult {
+  code: string;
+  found: boolean;
+  description: string | null;
+  system: string | null;
+  isGeneric: boolean;
+}
+
 export interface RecallRecord {
   campaignNumber: string;
   component: string;

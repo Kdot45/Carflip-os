@@ -22,6 +22,19 @@ in-person inspection to confirm, say so.
 - Never state or imply a certified diagnosis, an appraisal, or legal advice about \
 title/lien status.`;
 
+/**
+ * Governs what the listing extractor is allowed to infer rather than quote
+ * verbatim from the source. This is enforced in code (parseExtractionResponse
+ * strips anything outside this set back to null), not just in the prompt —
+ * a wrong guess on price, title status, year, mileage, or location can
+ * directly cause a bad purchase decision, so those must only ever come from
+ * text the user actually gave us. Vehicle make is the one exception: it's
+ * common-knowledge, low-stakes (easy to eyeball-verify against the car), and
+ * listings routinely name the model ("Mustang GT") without ever spelling out
+ * the brand.
+ */
+const INFERABLE_FIELDS = new Set(["make"]);
+
 export type RiskLevel = "low" | "medium" | "high";
 
 export interface TriageSuggestedLineItem {
@@ -74,9 +87,16 @@ export interface ListingExtraction {
   askingPrice: number | null;
   titleStatus: "clean" | "salvage" | "rebuilt" | "other" | null;
   zipForDeal: string | null;
-  /** Which fields the model was actually confident enough to fill in, so the
-   * frontend can highlight what it auto-filled vs. what still needs a human. */
+  /** Which fields were explicitly stated in the source and the model filled
+   * in verbatim, so the frontend can highlight what it auto-filled vs. what
+   * still needs a human. */
   fieldsFound: string[];
+  /** Which fields the model filled in by inference rather than an explicit
+   * quote (e.g. "make" from a model name). Always a subset of
+   * INFERABLE_FIELDS — the backend strips anything else back to null even
+   * if the model tries. The frontend should flag these for the user to
+   * double-check, distinctly from fieldsFound. */
+  fieldsInferred: string[];
   /** True only when this is a placeholder because no API call was made or it
    * failed — lets the frontend tell "AI unavailable" apart from "AI looked
    * and genuinely found nothing in this text/image". */
@@ -266,23 +286,38 @@ const EXTRACTION_JSON_SHAPE = `{
   "askingPrice": number | null,
   "titleStatus": "clean" | "salvage" | "rebuilt" | "other" | null,
   "zipForDeal": string | null,
-  "fieldsFound": string[] (the keys above that you were actually able to fill in)
+  "fieldsFound": string[] (keys above that were explicitly stated and you filled in verbatim),
+  "fieldsInferred": string[] (keys you filled in by inference rather than an explicit quote — only "make" may ever appear here)
 }`;
 
 function parseExtractionResponse(text: string): ListingExtraction {
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("Model response did not contain JSON");
   const parsed = JSON.parse(jsonMatch[0]);
+
+  const fieldsFound: string[] = Array.isArray(parsed.fieldsFound) ? parsed.fieldsFound : [];
+  const claimedInferred: string[] = Array.isArray(parsed.fieldsInferred) ? parsed.fieldsInferred : [];
+  // Enforced in code, not just the prompt: anything the model claims to have
+  // inferred outside INFERABLE_FIELDS is discarded rather than trusted.
+  const fieldsInferred = claimedInferred.filter((f) => INFERABLE_FIELDS.has(f));
+  const rejectedInferred = new Set(claimedInferred.filter((f) => !INFERABLE_FIELDS.has(f)));
+
+  function field<T>(key: string, value: T | null | undefined): T | null {
+    if (rejectedInferred.has(key)) return null;
+    return value ?? null;
+  }
+
   return {
-    year: parsed.year ?? null,
-    make: parsed.make ?? null,
-    model: parsed.model ?? null,
-    trim: parsed.trim ?? null,
-    miles: parsed.miles ?? null,
-    askingPrice: parsed.askingPrice ?? null,
-    titleStatus: parsed.titleStatus ?? null,
-    zipForDeal: parsed.zipForDeal ?? null,
-    fieldsFound: Array.isArray(parsed.fieldsFound) ? parsed.fieldsFound : [],
+    year: field("year", parsed.year),
+    make: field("make", parsed.make),
+    model: field("model", parsed.model),
+    trim: field("trim", parsed.trim),
+    miles: field("miles", parsed.miles),
+    askingPrice: field("askingPrice", parsed.askingPrice),
+    titleStatus: field("titleStatus", parsed.titleStatus),
+    zipForDeal: field("zipForDeal", parsed.zipForDeal),
+    fieldsFound,
+    fieldsInferred,
   };
 }
 
@@ -300,7 +335,11 @@ export async function extractListingDetails(rawText: string): Promise<ListingExt
 
   const userPrompt = `A user pasted the following text copied from a used-car listing they are \
 considering. Extract only what is explicitly stated — never guess or infer a value that isn't \
-clearly present in the text. If something isn't mentioned, use null for it.
+clearly present in the text, with one narrow exception: if the model name unambiguously belongs \
+to one manufacturer (e.g. "Mustang" is a Ford, "Wrangler" is a Jeep, "Civic" is a Honda) and the \
+make itself isn't stated, you may fill in make from that and list "make" in fieldsInferred. Never \
+infer year, mileage, asking price, title status, or ZIP — those must come only from what's \
+explicitly written. If something isn't mentioned or inferable this way, use null for it.
 
 Listing text:
 """
@@ -347,8 +386,12 @@ export async function extractListingDetailsFromImage(
   }
 
   const userPrompt = `This image is a screenshot of a used-car listing the user is considering, \
-captured on their own device. Extract only what is clearly visible in the image — never guess or \
-infer a value that isn't legible. If something isn't visible or you're not confident, use null.
+captured on their own device. Extract only what is clearly legible in the image — never guess or \
+infer a value that isn't visible, with one narrow exception: if the model name unambiguously \
+belongs to one manufacturer (e.g. "Mustang" is a Ford, "Wrangler" is a Jeep, "Civic" is a Honda) \
+and the make itself isn't shown, you may fill in make from that and list "make" in \
+fieldsInferred. Never infer year, mileage, asking price, title status, or ZIP — those must come \
+only from what's actually legible. If something isn't visible or inferable this way, use null.
 
 Respond with ONLY a JSON object matching this shape, no prose outside the JSON:
 ${EXTRACTION_JSON_SHAPE}`;
@@ -423,6 +466,7 @@ function mockExtraction(): ListingExtraction {
     titleStatus: null,
     zipForDeal: null,
     fieldsFound: [],
+    fieldsInferred: [],
     aiUnavailable: true,
   };
 }

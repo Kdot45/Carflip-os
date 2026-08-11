@@ -68,13 +68,24 @@ export function NewDealWizard() {
       titleStatus: extraction.titleStatus ?? p.titleStatus,
       zipForDeal: extraction.zipForDeal ?? p.zipForDeal,
     }));
-    setExtractionNote(
-      extraction.aiUnavailable
-        ? "AI assistant isn't configured on this deployment, so nothing was pulled automatically — fill in the fields below manually."
-        : extraction.fieldsFound.length > 0
-        ? `AI pre-filled ${extraction.fieldsFound.map((f) => FIELD_LABELS[f] ?? f).join(", ")} from the ${sourceLabel} — double-check before continuing.`
-        : `Couldn't confidently pull details from that ${sourceLabel} — fill in the fields below manually.`
-    );
+    if (extraction.aiUnavailable) {
+      setExtractionNote(
+        "AI assistant isn't configured on this deployment, so nothing was pulled automatically — fill in the fields below manually."
+      );
+    } else if (extraction.fieldsFound.length === 0 && extraction.fieldsInferred.length === 0) {
+      setExtractionNote(`Couldn't confidently pull details from that ${sourceLabel} — fill in the fields below manually.`);
+    } else {
+      const parts: string[] = [];
+      if (extraction.fieldsFound.length > 0) {
+        parts.push(`pre-filled ${extraction.fieldsFound.map((f) => FIELD_LABELS[f] ?? f).join(", ")} from the ${sourceLabel}`);
+      }
+      if (extraction.fieldsInferred.length > 0) {
+        parts.push(
+          `inferred ${extraction.fieldsInferred.map((f) => FIELD_LABELS[f] ?? f).join(", ")} from context (not stated outright)`
+        );
+      }
+      setExtractionNote(`AI ${parts.join(" and ")} — double-check everything before continuing.`);
+    }
     setHasExtracted(true);
   }
 

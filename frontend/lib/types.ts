@@ -29,6 +29,7 @@ export interface ListingExtraction {
   titleStatus: TitleStatus | null;
   zipForDeal: string | null;
   fieldsFound: string[];
+  fieldsInferred: string[];
   aiUnavailable?: boolean;
 }
 

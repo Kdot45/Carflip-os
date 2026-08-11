@@ -101,7 +101,10 @@ export interface BidCommentaryResult {
 }
 
 function getClient(): Anthropic | null {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  // Trimmed defensively: env vars pasted into a dashboard sometimes carry an
+  // invisible trailing newline/space, which makes Node's fetch reject the key
+  // as an illegal HTTP header value on every request.
+  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
   if (!apiKey) return null;
   return new Anthropic({ apiKey });
 }

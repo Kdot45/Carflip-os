@@ -184,6 +184,15 @@ export interface ChatResult {
   disclaimer: string;
 }
 
+export interface RecallRecord {
+  campaignNumber: string;
+  component: string;
+  summary: string;
+  consequence: string;
+  remedy: string;
+  reportedDate: string | null;
+}
+
 export interface ProjectDetail {
   project: Project;
   photos: ProjectPhoto[];

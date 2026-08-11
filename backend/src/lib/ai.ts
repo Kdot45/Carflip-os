@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { FEDERAL_CONSUMER_LAW_FACTS } from "./legalKnowledge";
 
 /**
  * AI is advisory only, everywhere in this app. Every response carries this
@@ -21,6 +22,14 @@ codes, symptoms, photos description). Do not invent facts about the specific car
 in-person inspection to confirm, say so.
 - Never state or imply a certified diagnosis, an appraisal, or legal advice about \
 title/lien status.`;
+
+/**
+ * Used for triage/chat/bid-commentary (not extraction, which has no reason to
+ * spend tokens on legal background). Grounds those answers in the federal
+ * facts below instead of letting the model generate legal-sounding text from
+ * memory, which is where hallucination risk is highest.
+ */
+const ADVISORY_SYSTEM_PROMPT = `${SYSTEM_PROMPT}\n\n${FEDERAL_CONSUMER_LAW_FACTS}`;
 
 /**
  * Governs what the listing extractor is allowed to infer rather than quote
@@ -170,7 +179,7 @@ Respond with ONLY a JSON object matching this shape, no prose outside the JSON:
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: 2000,
-      system: SYSTEM_PROMPT,
+      system: ADVISORY_SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
     });
 
@@ -210,7 +219,7 @@ export async function runChat(
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: 1000,
-      system: `${SYSTEM_PROMPT}\n\n${contextPrefix}`,
+      system: `${ADVISORY_SYSTEM_PROMPT}\n\n${contextPrefix}`,
       messages: history.map((m) => ({ role: m.role, content: m.content })),
     });
 
@@ -263,7 +272,7 @@ Plain text only, no JSON, no markdown headers.`;
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: 400,
-      system: SYSTEM_PROMPT,
+      system: ADVISORY_SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
     });
 

@@ -9,6 +9,7 @@ import { projectReceiptsRouter, receiptsRouter } from "./routes/receipts.routes"
 import { projectChecklistRouter, checklistRouter } from "./routes/checklist.routes";
 import { projectPhotosRouter, photosRouter } from "./routes/photos.routes";
 import { aiRouter, aiUtilityRouter } from "./routes/ai.routes";
+import { projectRecallsRouter } from "./routes/recalls.routes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { ensureUploadDir } from "./lib/storage";
 
@@ -39,6 +40,7 @@ app.use("/projects/:id/receipts", projectReceiptsRouter);
 app.use("/projects/:id/checklist", projectChecklistRouter);
 app.use("/projects/:id/photos", projectPhotosRouter);
 app.use("/projects/:id/ai", aiRouter);
+app.use("/projects/:id/recalls", projectRecallsRouter);
 
 // Flat resources addressed by their own id (line items, receipts, checklist
 // items, photos), per the spec's endpoint list.

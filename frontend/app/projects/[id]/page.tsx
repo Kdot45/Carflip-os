@@ -11,6 +11,7 @@ import { NotesSection } from "@/components/notes/NotesSection";
 import { ReceiptsSection } from "@/components/receipts/ReceiptsSection";
 import { ChecklistSection } from "@/components/checklist/ChecklistSection";
 import { PhotosSection } from "@/components/photos/PhotosSection";
+import { RecallsSection } from "@/components/recalls/RecallsSection";
 import { AiAssistantPanel } from "@/components/ai/AiAssistantPanel";
 import { BottomActionBar } from "@/components/nav/BottomActionBar";
 import { Button } from "@/components/ui/Button";
@@ -49,6 +50,8 @@ function ProjectDetailContent({ id }: { id: string }) {
         project={project}
         onUpdated={(updated) => setDetail({ ...detail, project: updated })}
       />
+
+      <RecallsSection projectId={id} />
 
       <RepairEstimateEditor
         projectId={id}

@@ -65,6 +65,20 @@ export interface ChatResult {
   disclaimer: string;
 }
 
+export interface ListingExtraction {
+  year: number | null;
+  make: string | null;
+  model: string | null;
+  trim: string | null;
+  miles: number | null;
+  askingPrice: number | null;
+  titleStatus: "clean" | "salvage" | "rebuilt" | "other" | null;
+  zipForDeal: string | null;
+  /** Which fields the model was actually confident enough to fill in, so the
+   * frontend can highlight what it auto-filled vs. what still needs a human. */
+  fieldsFound: string[];
+}
+
 function getClient(): Anthropic | null {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
@@ -166,6 +180,72 @@ export async function runChat(
   }
 }
 
+/**
+ * Parses free-text a user pasted from a listing (something they copied
+ * themselves — this never fetches or touches the source site) into
+ * structured deal fields, so the New Deal wizard can pre-fill itself instead
+ * of making the user retype what's already in the text they pasted.
+ */
+export async function extractListingDetails(rawText: string): Promise<ListingExtraction> {
+  const client = getClient();
+  if (!client) {
+    return mockExtraction();
+  }
+
+  const userPrompt = `A user pasted the following text copied from a used-car listing they are \
+considering. Extract only what is explicitly stated — never guess or infer a value that isn't \
+clearly present in the text. If something isn't mentioned, use null for it.
+
+Listing text:
+"""
+${rawText}
+"""
+
+Respond with ONLY a JSON object matching this shape, no prose outside the JSON:
+{
+  "year": number | null,
+  "make": string | null,
+  "model": string | null,
+  "trim": string | null,
+  "miles": number | null,
+  "askingPrice": number | null,
+  "titleStatus": "clean" | "salvage" | "rebuilt" | "other" | null,
+  "zipForDeal": string | null,
+  "fieldsFound": string[] (the keys above that you were actually able to fill in)
+}`;
+
+  try {
+    const response = await client.messages.create({
+      model: MODEL,
+      max_tokens: 600,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userPrompt }],
+    });
+
+    const textBlock = response.content.find((block) => block.type === "text");
+    if (!textBlock || textBlock.type !== "text") throw new Error("No text response from model");
+
+    const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Model response did not contain JSON");
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    return {
+      year: parsed.year ?? null,
+      make: parsed.make ?? null,
+      model: parsed.model ?? null,
+      trim: parsed.trim ?? null,
+      miles: parsed.miles ?? null,
+      askingPrice: parsed.askingPrice ?? null,
+      titleStatus: parsed.titleStatus ?? null,
+      zipForDeal: parsed.zipForDeal ?? null,
+      fieldsFound: Array.isArray(parsed.fieldsFound) ? parsed.fieldsFound : [],
+    };
+  } catch (err) {
+    console.error("[ai.extractListingDetails] falling back to mock response:", err);
+    return mockExtraction();
+  }
+}
+
 /** Used when ANTHROPIC_API_KEY isn't set, or if a live call fails, so the
  * rest of the app stays usable without an AI subscription. Clearly labeled
  * as a mock in the returned text so it's never mistaken for a real triage. */
@@ -196,6 +276,20 @@ function mockTriage(input: TriageInput): TriageResult {
       : null,
     suggestedLineItems,
     disclaimer: AI_DISCLAIMER,
+  };
+}
+
+function mockExtraction(): ListingExtraction {
+  return {
+    year: null,
+    make: null,
+    model: null,
+    trim: null,
+    miles: null,
+    askingPrice: null,
+    titleStatus: null,
+    zipForDeal: null,
+    fieldsFound: [],
   };
 }
 

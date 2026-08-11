@@ -6,10 +6,21 @@ import { Button } from "@/components/ui/Button";
 import { Input, Label, Select, Textarea, FieldError } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { api, ApiRequestError } from "@/lib/api";
-import { PhotoType, Project, TitleStatus } from "@/lib/types";
+import { ListingExtraction, PhotoType, Project, TitleStatus } from "@/lib/types";
 import clsx from "@/lib/clsx";
 
-const STEPS = ["Vehicle Info", "Price & Title", "Listing Text", "Photos", "OBD Codes"] as const;
+const STEPS = ["Listing Text", "Vehicle Info", "Price & Title", "Photos", "OBD Codes"] as const;
+
+const FIELD_LABELS: Record<string, string> = {
+  year: "year",
+  make: "make",
+  model: "model",
+  trim: "trim",
+  miles: "mileage",
+  askingPrice: "asking price",
+  titleStatus: "title status",
+  zipForDeal: "ZIP",
+};
 
 const PHOTO_TYPES: { value: PhotoType; label: string }[] = [
   { value: "exterior", label: "Exterior" },
@@ -27,6 +38,9 @@ export function NewDealWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [uploadedCount, setUploadedCount] = useState(0);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [hasExtracted, setHasExtracted] = useState(false);
+  const [extractionNote, setExtractionNote] = useState<string | null>(null);
 
   const [vehicle, setVehicle] = useState({ year: "", make: "", model: "", trim: "", miles: "" });
   const [pricing, setPricing] = useState({
@@ -43,7 +57,45 @@ export function NewDealWizard() {
   async function goNext() {
     setError(null);
 
-    // Creating the project happens once, right after "Listing Text", since
+    // Leaving the pasted-listing step: ask AI to pull structured fields out
+    // of text the user already copied themselves, so Vehicle Info / Price &
+    // Title arrive pre-filled instead of asking for everything twice. This
+    // never touches the source site — it only reads the pasted text.
+    if (stepIndex === 0 && listingNotesText.trim() && !hasExtracted) {
+      setIsExtracting(true);
+      try {
+        const extraction = await api.post<ListingExtraction>("/ai/extract-listing", {
+          text: listingNotesText,
+        });
+        setVehicle((v) => ({
+          year: extraction.year !== null ? String(extraction.year) : v.year,
+          make: extraction.make ?? v.make,
+          model: extraction.model ?? v.model,
+          trim: extraction.trim ?? v.trim,
+          miles: extraction.miles !== null ? String(extraction.miles) : v.miles,
+        }));
+        setPricing((p) => ({
+          ...p,
+          askingPrice: extraction.askingPrice !== null ? String(extraction.askingPrice) : p.askingPrice,
+          titleStatus: extraction.titleStatus ?? p.titleStatus,
+          zipForDeal: extraction.zipForDeal ?? p.zipForDeal,
+        }));
+        setExtractionNote(
+          extraction.fieldsFound.length > 0
+            ? `AI pre-filled ${extraction.fieldsFound.map((f) => FIELD_LABELS[f] ?? f).join(", ")} from the listing text — double-check before continuing.`
+            : "Couldn't confidently pull details from that text — fill in the fields below manually."
+        );
+      } catch {
+        // Extraction is a convenience, not a requirement — if it fails, the
+        // user just fills in the fields by hand like before.
+        setExtractionNote(null);
+      } finally {
+        setHasExtracted(true);
+        setIsExtracting(false);
+      }
+    }
+
+    // Creating the project happens once, right after "Price & Title", since
     // photo/OBD uploads need a project id to attach to.
     if (stepIndex === 2 && !projectId) {
       setIsSubmitting(true);
@@ -130,7 +182,28 @@ export function NewDealWizard() {
         <h2 className="mb-4 text-base font-semibold text-slate-900 sm:hidden">{STEPS[stepIndex]}</h2>
 
         {stepIndex === 0 && (
+          <div>
+            <Label htmlFor="listingNotes">Paste the listing text</Label>
+            <Textarea
+              id="listingNotes"
+              rows={8}
+              placeholder="Paste the seller's description, your notes from a call, anything relevant…"
+              value={listingNotesText}
+              onChange={(e) => setListingNotesText(e.target.value)}
+            />
+            <p className="mt-2 text-xs text-slate-500">
+              Optional, but AI will pull the year/make/model/price/mileage out of this and pre-fill the next
+              two steps for you. Nothing here is ever sent to the listing site — this only reads text you
+              paste in yourself.
+            </p>
+          </div>
+        )}
+
+        {stepIndex === 1 && (
           <div className="space-y-4">
+            {extractionNote && (
+              <p className="rounded-lg bg-accent-50 p-2.5 text-xs text-accent-700">{extractionNote}</p>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="year">Year</Label>
@@ -170,7 +243,7 @@ export function NewDealWizard() {
           </div>
         )}
 
-        {stepIndex === 1 && (
+        {stepIndex === 2 && (
           <div className="space-y-4">
             <div>
               <Label htmlFor="askingPrice">Asking price</Label>
@@ -215,19 +288,6 @@ export function NewDealWizard() {
                 onChange={(e) => setPricing({ ...pricing, listingUrl: e.target.value })}
               />
             </div>
-          </div>
-        )}
-
-        {stepIndex === 2 && (
-          <div>
-            <Label htmlFor="listingNotes">Paste the listing text</Label>
-            <Textarea
-              id="listingNotes"
-              rows={8}
-              placeholder="Paste the seller's description, your notes from a call, anything relevant…"
-              value={listingNotesText}
-              onChange={(e) => setListingNotesText(e.target.value)}
-            />
           </div>
         )}
 
@@ -282,10 +342,13 @@ export function NewDealWizard() {
               fullWidth
               onClick={goNext}
               disabled={
-                isSubmitting || (stepIndex === 0 && !step1Valid) || (stepIndex === 1 && !step2Valid)
+                isSubmitting ||
+                isExtracting ||
+                (stepIndex === 1 && !step1Valid) ||
+                (stepIndex === 2 && !step2Valid)
               }
             >
-              {isSubmitting ? "Saving…" : "Next"}
+              {isExtracting ? "Reading listing…" : isSubmitting ? "Saving…" : "Next"}
             </Button>
           ) : (
             <Button type="button" fullWidth onClick={handleFinish} disabled={isSubmitting}>

@@ -8,7 +8,7 @@ import { projectEstimatesRouter, estimatesRouter, lineItemsRouter } from "./rout
 import { projectReceiptsRouter, receiptsRouter } from "./routes/receipts.routes";
 import { projectChecklistRouter, checklistRouter } from "./routes/checklist.routes";
 import { projectPhotosRouter, photosRouter } from "./routes/photos.routes";
-import { aiRouter } from "./routes/ai.routes";
+import { aiRouter, aiUtilityRouter } from "./routes/ai.routes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { ensureUploadDir } from "./lib/storage";
 
@@ -30,6 +30,7 @@ app.use("/uploads", express.static(path.resolve(UPLOAD_DIR)));
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.use("/auth", authRouter);
+app.use("/ai", aiUtilityRouter);
 app.use("/projects", projectsRouter);
 
 // Nested, project-scoped resources.

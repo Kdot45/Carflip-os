@@ -4,10 +4,31 @@ import { prisma } from "../lib/prisma";
 import { requireAuth } from "../middleware/requireAuth";
 import { asyncHandler } from "../middleware/errorHandler";
 import { getOwnedProject } from "../lib/ownership";
-import { runChat, runTriage } from "../lib/ai";
+import { extractListingDetails, runChat, runTriage } from "../lib/ai";
 
 export const aiRouter = Router({ mergeParams: true });
 aiRouter.use(requireAuth);
+
+// Not project-scoped — this runs during the New Deal wizard, before a
+// project exists yet, on text the user pasted themselves. Never touches
+// the source listing's site; it only reads text already sitting in the
+// request body.
+export const aiUtilityRouter = Router();
+aiUtilityRouter.use(requireAuth);
+
+const extractSchema = z.object({
+  text: z.string().min(1).max(20000),
+});
+
+// POST /ai/extract-listing
+aiUtilityRouter.post(
+  "/extract-listing",
+  asyncHandler(async (req, res) => {
+    const input = extractSchema.parse(req.body);
+    const result = await extractListingDetails(input.text);
+    res.json(result);
+  })
+);
 
 function vehicleDescription(project: { year: number; make: string; model: string; trim: string | null }) {
   return `${project.year} ${project.make} ${project.model}${project.trim ? ` ${project.trim}` : ""}`;

@@ -19,6 +19,18 @@ export interface User {
 export type ProjectStatus = "lead" | "bought" | "repairing" | "listed" | "sold" | "abandoned";
 export type TitleStatus = "clean" | "salvage" | "rebuilt" | "other";
 
+export interface ListingExtraction {
+  year: number | null;
+  make: string | null;
+  model: string | null;
+  trim: string | null;
+  miles: number | null;
+  askingPrice: number | null;
+  titleStatus: TitleStatus | null;
+  zipForDeal: string | null;
+  fieldsFound: string[];
+}
+
 export interface Project {
   id: string;
   userId: string;

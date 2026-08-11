@@ -180,6 +180,35 @@ export async function runChat(
   }
 }
 
+const EXTRACTION_JSON_SHAPE = `{
+  "year": number | null,
+  "make": string | null,
+  "model": string | null,
+  "trim": string | null,
+  "miles": number | null,
+  "askingPrice": number | null,
+  "titleStatus": "clean" | "salvage" | "rebuilt" | "other" | null,
+  "zipForDeal": string | null,
+  "fieldsFound": string[] (the keys above that you were actually able to fill in)
+}`;
+
+function parseExtractionResponse(text: string): ListingExtraction {
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("Model response did not contain JSON");
+  const parsed = JSON.parse(jsonMatch[0]);
+  return {
+    year: parsed.year ?? null,
+    make: parsed.make ?? null,
+    model: parsed.model ?? null,
+    trim: parsed.trim ?? null,
+    miles: parsed.miles ?? null,
+    askingPrice: parsed.askingPrice ?? null,
+    titleStatus: parsed.titleStatus ?? null,
+    zipForDeal: parsed.zipForDeal ?? null,
+    fieldsFound: Array.isArray(parsed.fieldsFound) ? parsed.fieldsFound : [],
+  };
+}
+
 /**
  * Parses free-text a user pasted from a listing (something they copied
  * themselves — this never fetches or touches the source site) into
@@ -202,17 +231,7 @@ ${rawText}
 """
 
 Respond with ONLY a JSON object matching this shape, no prose outside the JSON:
-{
-  "year": number | null,
-  "make": string | null,
-  "model": string | null,
-  "trim": string | null,
-  "miles": number | null,
-  "askingPrice": number | null,
-  "titleStatus": "clean" | "salvage" | "rebuilt" | "other" | null,
-  "zipForDeal": string | null,
-  "fieldsFound": string[] (the keys above that you were actually able to fill in)
-}`;
+${EXTRACTION_JSON_SHAPE}`;
 
   try {
     const response = await client.messages.create({
@@ -225,23 +244,60 @@ Respond with ONLY a JSON object matching this shape, no prose outside the JSON:
     const textBlock = response.content.find((block) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") throw new Error("No text response from model");
 
-    const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("Model response did not contain JSON");
-
-    const parsed = JSON.parse(jsonMatch[0]);
-    return {
-      year: parsed.year ?? null,
-      make: parsed.make ?? null,
-      model: parsed.model ?? null,
-      trim: parsed.trim ?? null,
-      miles: parsed.miles ?? null,
-      askingPrice: parsed.askingPrice ?? null,
-      titleStatus: parsed.titleStatus ?? null,
-      zipForDeal: parsed.zipForDeal ?? null,
-      fieldsFound: Array.isArray(parsed.fieldsFound) ? parsed.fieldsFound : [],
-    };
+    return parseExtractionResponse(textBlock.text);
   } catch (err) {
     console.error("[ai.extractListingDetails] falling back to mock response:", err);
+    return mockExtraction();
+  }
+}
+
+export type SupportedImageMediaType = "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+
+/**
+ * Same extraction as extractListingDetails, but from a screenshot the user
+ * captured themselves instead of pasted text — useful when a listing is
+ * awkward to copy-paste from (e.g. a mobile marketplace app). This only
+ * ever reads the image bytes the user uploaded; it never fetches anything
+ * from a URL or the source site.
+ */
+export async function extractListingDetailsFromImage(
+  imageBase64: string,
+  mediaType: SupportedImageMediaType
+): Promise<ListingExtraction> {
+  const client = getClient();
+  if (!client) {
+    return mockExtraction();
+  }
+
+  const userPrompt = `This image is a screenshot of a used-car listing the user is considering, \
+captured on their own device. Extract only what is clearly visible in the image — never guess or \
+infer a value that isn't legible. If something isn't visible or you're not confident, use null.
+
+Respond with ONLY a JSON object matching this shape, no prose outside the JSON:
+${EXTRACTION_JSON_SHAPE}`;
+
+  try {
+    const response = await client.messages.create({
+      model: MODEL,
+      max_tokens: 600,
+      system: SYSTEM_PROMPT,
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: mediaType, data: imageBase64 } },
+            { type: "text", text: userPrompt },
+          ],
+        },
+      ],
+    });
+
+    const textBlock = response.content.find((block) => block.type === "text");
+    if (!textBlock || textBlock.type !== "text") throw new Error("No text response from model");
+
+    return parseExtractionResponse(textBlock.text);
+  } catch (err) {
+    console.error("[ai.extractListingDetailsFromImage] falling back to mock response:", err);
     return mockExtraction();
   }
 }

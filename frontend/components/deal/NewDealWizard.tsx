@@ -54,43 +54,62 @@ export function NewDealWizard() {
 
   const isLastStep = stepIndex === STEPS.length - 1;
 
+  function applyExtraction(extraction: ListingExtraction, sourceLabel: string) {
+    setVehicle((v) => ({
+      year: extraction.year !== null ? String(extraction.year) : v.year,
+      make: extraction.make ?? v.make,
+      model: extraction.model ?? v.model,
+      trim: extraction.trim ?? v.trim,
+      miles: extraction.miles !== null ? String(extraction.miles) : v.miles,
+    }));
+    setPricing((p) => ({
+      ...p,
+      askingPrice: extraction.askingPrice !== null ? String(extraction.askingPrice) : p.askingPrice,
+      titleStatus: extraction.titleStatus ?? p.titleStatus,
+      zipForDeal: extraction.zipForDeal ?? p.zipForDeal,
+    }));
+    setExtractionNote(
+      extraction.fieldsFound.length > 0
+        ? `AI pre-filled ${extraction.fieldsFound.map((f) => FIELD_LABELS[f] ?? f).join(", ")} from the ${sourceLabel} — double-check before continuing.`
+        : `Couldn't confidently pull details from that ${sourceLabel} — fill in the fields below manually.`
+    );
+    setHasExtracted(true);
+  }
+
+  async function handleScreenshotUpload(file: File) {
+    setError(null);
+    setIsExtracting(true);
+    try {
+      const formData = new FormData();
+      formData.append("photo", file);
+      const extraction = await api.post<ListingExtraction>("/ai/extract-listing-image", formData);
+      applyExtraction(extraction, "screenshot");
+    } catch (err) {
+      setError(err instanceof ApiRequestError ? err.message : "Couldn't read that screenshot. Try again.");
+    } finally {
+      setIsExtracting(false);
+    }
+  }
+
   async function goNext() {
     setError(null);
 
     // Leaving the pasted-listing step: ask AI to pull structured fields out
     // of text the user already copied themselves, so Vehicle Info / Price &
     // Title arrive pre-filled instead of asking for everything twice. This
-    // never touches the source site — it only reads the pasted text.
+    // never touches the source site — it only reads the pasted text. Skipped
+    // if a screenshot already filled things in (hasExtracted).
     if (stepIndex === 0 && listingNotesText.trim() && !hasExtracted) {
       setIsExtracting(true);
       try {
         const extraction = await api.post<ListingExtraction>("/ai/extract-listing", {
           text: listingNotesText,
         });
-        setVehicle((v) => ({
-          year: extraction.year !== null ? String(extraction.year) : v.year,
-          make: extraction.make ?? v.make,
-          model: extraction.model ?? v.model,
-          trim: extraction.trim ?? v.trim,
-          miles: extraction.miles !== null ? String(extraction.miles) : v.miles,
-        }));
-        setPricing((p) => ({
-          ...p,
-          askingPrice: extraction.askingPrice !== null ? String(extraction.askingPrice) : p.askingPrice,
-          titleStatus: extraction.titleStatus ?? p.titleStatus,
-          zipForDeal: extraction.zipForDeal ?? p.zipForDeal,
-        }));
-        setExtractionNote(
-          extraction.fieldsFound.length > 0
-            ? `AI pre-filled ${extraction.fieldsFound.map((f) => FIELD_LABELS[f] ?? f).join(", ")} from the listing text — double-check before continuing.`
-            : "Couldn't confidently pull details from that text — fill in the fields below manually."
-        );
+        applyExtraction(extraction, "listing text");
       } catch {
         // Extraction is a convenience, not a requirement — if it fails, the
         // user just fills in the fields by hand like before.
-        setExtractionNote(null);
       } finally {
-        setHasExtracted(true);
         setIsExtracting(false);
       }
     }
@@ -192,9 +211,34 @@ export function NewDealWizard() {
               onChange={(e) => setListingNotesText(e.target.value)}
             />
             <p className="mt-2 text-xs text-slate-500">
-              Optional, but AI will pull the year/make/model/price/mileage out of this and pre-fill the next
-              two steps for you. Nothing here is ever sent to the listing site — this only reads text you
-              paste in yourself.
+              AI will pull the year/make/model/price/mileage out of this and pre-fill the next two steps
+              for you. Nothing here is ever sent to the listing site — this only reads text you paste in
+              yourself.
+            </p>
+
+            <div className="my-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-slate-200" />
+              <span className="text-xs font-medium text-slate-400">OR</span>
+              <div className="h-px flex-1 bg-slate-200" />
+            </div>
+
+            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 px-4 py-3.5 text-sm font-medium text-accent-600 hover:bg-accent-50">
+              {isExtracting ? "Reading screenshot…" : "📷 Upload a screenshot instead"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={isExtracting}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleScreenshotUpload(file);
+                }}
+              />
+            </label>
+            <p className="mt-2 text-xs text-slate-500">
+              Screenshot the listing on your own phone and upload it here — good for listings that are
+              awkward to copy text from. Same rule applies: only the image you upload is read, nothing is
+              fetched from any site.
             </p>
           </div>
         )}

@@ -1,10 +1,35 @@
 import { Router } from "express";
+import multer from "multer";
 import { z } from "zod";
 import { prisma } from "../lib/prisma";
 import { requireAuth } from "../middleware/requireAuth";
-import { asyncHandler } from "../middleware/errorHandler";
+import { asyncHandler, ApiError } from "../middleware/errorHandler";
 import { getOwnedProject } from "../lib/ownership";
-import { extractListingDetails, runChat, runTriage } from "../lib/ai";
+import {
+  extractListingDetails,
+  extractListingDetailsFromImage,
+  runChat,
+  runTriage,
+  SupportedImageMediaType,
+} from "../lib/ai";
+
+const SUPPORTED_IMAGE_TYPES: SupportedImageMediaType[] = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+];
+
+const screenshotUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(new Error("Only image uploads are allowed"));
+    }
+    cb(null, true);
+  },
+});
 
 export const aiRouter = Router({ mergeParams: true });
 aiRouter.use(requireAuth);
@@ -26,6 +51,26 @@ aiUtilityRouter.post(
   asyncHandler(async (req, res) => {
     const input = extractSchema.parse(req.body);
     const result = await extractListingDetails(input.text);
+    res.json(result);
+  })
+);
+
+// POST /ai/extract-listing-image — multipart/form-data with field `photo`.
+// For listings that are awkward to copy-paste text from. Only ever reads
+// the uploaded image bytes; never fetches the source listing's URL.
+aiUtilityRouter.post(
+  "/extract-listing-image",
+  screenshotUpload.single("photo"),
+  asyncHandler(async (req, res) => {
+    if (!req.file) throw new ApiError(400, "Missing `photo` file");
+    if (!SUPPORTED_IMAGE_TYPES.includes(req.file.mimetype as SupportedImageMediaType)) {
+      throw new ApiError(400, "Unsupported image type — use JPEG, PNG, GIF, or WEBP");
+    }
+    const base64 = req.file.buffer.toString("base64");
+    const result = await extractListingDetailsFromImage(
+      base64,
+      req.file.mimetype as SupportedImageMediaType
+    );
     res.json(result);
   })
 );

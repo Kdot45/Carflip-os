@@ -31,7 +31,7 @@ export function LineItemRow({
           {formatCurrencyPrecise(item.partsCost)} parts + {item.laborHours}h × {formatCurrencyPrecise(item.laborRate)}
         </p>
         <div className="mt-1 flex justify-end gap-2 text-xs">
-          <button onClick={onEdit} className="font-medium text-accent-600 hover:text-accent-700">
+          <button onClick={onEdit} className="font-medium text-accent-500 hover:text-accent-400">
             Edit
           </button>
           <button onClick={onDelete} className="font-medium text-ink-300 hover:text-bad">

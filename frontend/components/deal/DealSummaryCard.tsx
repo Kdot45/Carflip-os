@@ -82,7 +82,7 @@ export function DealSummaryCard({
             <p className="text-sm text-ink-300">Location: {project.zipForDeal}</p>
             <button
               onClick={() => setIsEditing(true)}
-              className="text-sm font-medium text-accent-600 hover:text-accent-700"
+              className="text-sm font-medium text-accent-500 hover:text-accent-400"
             >
               Edit
             </button>

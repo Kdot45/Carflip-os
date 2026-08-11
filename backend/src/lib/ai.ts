@@ -77,6 +77,10 @@ export interface ListingExtraction {
   /** Which fields the model was actually confident enough to fill in, so the
    * frontend can highlight what it auto-filled vs. what still needs a human. */
   fieldsFound: string[];
+  /** True only when this is a placeholder because no API call was made or it
+   * failed — lets the frontend tell "AI unavailable" apart from "AI looked
+   * and genuinely found nothing in this text/image". */
+  aiUnavailable?: boolean;
 }
 
 export interface BidCommentaryInput {
@@ -416,6 +420,7 @@ function mockExtraction(): ListingExtraction {
     titleStatus: null,
     zipForDeal: null,
     fieldsFound: [],
+    aiUnavailable: true,
   };
 }
 

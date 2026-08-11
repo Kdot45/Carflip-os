@@ -69,7 +69,9 @@ export function NewDealWizard() {
       zipForDeal: extraction.zipForDeal ?? p.zipForDeal,
     }));
     setExtractionNote(
-      extraction.fieldsFound.length > 0
+      extraction.aiUnavailable
+        ? "AI assistant isn't configured on this deployment, so nothing was pulled automatically — fill in the fields below manually."
+        : extraction.fieldsFound.length > 0
         ? `AI pre-filled ${extraction.fieldsFound.map((f) => FIELD_LABELS[f] ?? f).join(", ")} from the ${sourceLabel} — double-check before continuing.`
         : `Couldn't confidently pull details from that ${sourceLabel} — fill in the fields below manually.`
     );
@@ -222,7 +224,7 @@ export function NewDealWizard() {
               <div className="h-px flex-1 bg-ink-500" />
             </div>
 
-            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-ink-400 px-4 py-3.5 text-sm font-medium text-accent-600 hover:bg-accent-50">
+            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-ink-400 px-4 py-3.5 text-sm font-medium text-accent-500 hover:bg-ink-700">
               {isExtracting ? "Reading screenshot…" : "📷 Upload a screenshot instead"}
               <input
                 type="file"
@@ -246,7 +248,9 @@ export function NewDealWizard() {
         {stepIndex === 1 && (
           <div className="space-y-4">
             {extractionNote && (
-              <p className="rounded-lg bg-accent-50 p-2.5 text-xs text-accent-700">{extractionNote}</p>
+              <p className="rounded-lg border border-accent-500/20 bg-accent-500/10 p-2.5 text-xs text-accent-400">
+                {extractionNote}
+              </p>
             )}
             <div className="grid grid-cols-2 gap-3">
               <div>

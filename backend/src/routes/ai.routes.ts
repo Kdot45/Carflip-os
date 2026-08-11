@@ -5,9 +5,11 @@ import { prisma } from "../lib/prisma";
 import { requireAuth } from "../middleware/requireAuth";
 import { asyncHandler, ApiError } from "../middleware/errorHandler";
 import { getOwnedProject } from "../lib/ownership";
+import { recalculateEstimate } from "../lib/recalculate";
 import {
   extractListingDetails,
   extractListingDetailsFromImage,
+  runBidCommentary,
   runChat,
   runTriage,
   SupportedImageMediaType,
@@ -153,6 +155,58 @@ aiRouter.post(
         purpose: "chat",
         inputSummary: input.messages[input.messages.length - 1].content.slice(0, 4000),
         outputSummary: result.reply.slice(0, 4000),
+      },
+    });
+
+    res.json(result);
+  })
+);
+
+// POST /projects/:id/ai/bid-commentary — a short qualitative take that sits
+// alongside the (non-AI, plain-formula) suggested max bid. Never generates
+// the bid number itself — that stays a transparent calculation the user can
+// audit; this only adds commentary on top of numbers that already exist.
+aiRouter.post(
+  "/bid-commentary",
+  asyncHandler(async (req, res) => {
+    const project = await getOwnedProject(req.userId as string, req.params.id);
+
+    const latestEstimate = await prisma.repairEstimate.findFirst({
+      where: { projectId: project.id },
+      orderBy: { createdAt: "desc" },
+    });
+    if (!latestEstimate) {
+      throw new ApiError(400, "Add a repair estimate first — there's nothing to comment on yet");
+    }
+
+    const { maxBid } = await recalculateEstimate(latestEstimate.id);
+    const estimate = await prisma.repairEstimate.findUniqueOrThrow({
+      where: { id: latestEstimate.id },
+      include: { lineItems: true },
+    });
+
+    const result = await runBidCommentary({
+      vehicleDescription: vehicleDescription(project),
+      listingNotes: project.listingNotesText,
+      repairLineItems: estimate.lineItems.map((li) => ({ title: li.title, severity: li.severity })),
+      askingPrice: Number(project.askingPrice),
+      totalExpectedRepair: Number(estimate.totalExpected),
+      suggestedMaxBid: maxBid.suggestedMaxBid,
+      expectedProfitAtAsking: maxBid.expectedProfitAtAsking,
+      marginAtAskingPct: maxBid.marginAtAskingPct,
+      dealLabel: maxBid.dealLabel,
+    });
+
+    await prisma.aiRun.create({
+      data: {
+        projectId: project.id,
+        purpose: "estimate",
+        inputSummary: JSON.stringify({
+          askingPrice: Number(project.askingPrice),
+          suggestedMaxBid: maxBid.suggestedMaxBid,
+          dealLabel: maxBid.dealLabel,
+        }).slice(0, 4000),
+        outputSummary: result.take.slice(0, 4000),
       },
     });
 

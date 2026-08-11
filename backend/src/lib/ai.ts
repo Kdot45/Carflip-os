@@ -79,6 +79,23 @@ export interface ListingExtraction {
   fieldsFound: string[];
 }
 
+export interface BidCommentaryInput {
+  vehicleDescription: string;
+  listingNotes: string | null;
+  repairLineItems: { title: string; severity: string }[];
+  askingPrice: number;
+  totalExpectedRepair: number;
+  suggestedMaxBid: number | null;
+  expectedProfitAtAsking: number | null;
+  marginAtAskingPct: number | null;
+  dealLabel: "good" | "marginal" | "bad" | "unknown";
+}
+
+export interface BidCommentaryResult {
+  take: string;
+  disclaimer: string;
+}
+
 function getClient(): Anthropic | null {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
@@ -177,6 +194,59 @@ export async function runChat(
   } catch (err) {
     console.error("[ai.runChat] falling back to mock response:", err);
     return mockChat(history);
+  }
+}
+
+/**
+ * A short qualitative read that sits alongside the (non-AI, plain-formula)
+ * suggested max bid — never replaces it. The bid number itself stays a
+ * transparent calculation; this is just commentary on top of it.
+ */
+export async function runBidCommentary(input: BidCommentaryInput): Promise<BidCommentaryResult> {
+  const client = getClient();
+  if (!client) {
+    return mockBidCommentary(input);
+  }
+
+  const lineItemsSummary =
+    input.repairLineItems.length > 0
+      ? input.repairLineItems.map((li) => `${li.title} (${li.severity})`).join(", ")
+      : "(no repair line items entered yet)";
+
+  const userPrompt = `Vehicle: ${input.vehicleDescription}
+
+Listing notes: ${input.listingNotes ?? "(none provided)"}
+
+Repair checklist so far: ${lineItemsSummary}
+Total expected repair cost: $${input.totalExpectedRepair}
+
+Deal math (already calculated, not something you need to compute):
+- Asking price: $${input.askingPrice}
+- Suggested max bid: ${input.suggestedMaxBid !== null ? `$${input.suggestedMaxBid}` : "not available (no resale price set yet)"}
+- Expected profit at asking price: ${input.expectedProfitAtAsking !== null ? `$${input.expectedProfitAtAsking}` : "n/a"}
+- Margin at asking price: ${input.marginAtAskingPct !== null ? `${input.marginAtAskingPct}%` : "n/a"}
+- Deal label: ${input.dealLabel}
+
+In 2-4 sentences, give a practical take on this deal beyond what the numbers alone show: any risk the math \
+doesn't capture, whether the repair checklist looks complete for what's described, and one concrete \
+negotiation angle if there's an obvious one. Don't restate the numbers back — add something to them. \
+Plain text only, no JSON, no markdown headers.`;
+
+  try {
+    const response = await client.messages.create({
+      model: MODEL,
+      max_tokens: 400,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userPrompt }],
+    });
+
+    const textBlock = response.content.find((block) => block.type === "text");
+    const take = textBlock && textBlock.type === "text" ? textBlock.text.trim() : "";
+
+    return { take, disclaimer: AI_DISCLAIMER };
+  } catch (err) {
+    console.error("[ai.runBidCommentary] falling back to mock response:", err);
+    return mockBidCommentary(input);
   }
 }
 
@@ -356,6 +426,15 @@ function mockChat(history: ChatMessage[]): ChatResult {
       `AI assistant is not configured on this deployment (ANTHROPIC_API_KEY is unset), so this is a ` +
       `placeholder reply rather than a real answer to: "${lastMessage.slice(0, 120)}". ` +
       `Set ANTHROPIC_API_KEY in backend/.env to enable the live assistant.`,
+    disclaimer: AI_DISCLAIMER,
+  };
+}
+
+function mockBidCommentary(_input: BidCommentaryInput): BidCommentaryResult {
+  return {
+    take:
+      "AI assistant is not configured on this deployment (ANTHROPIC_API_KEY is unset), so this is a " +
+      "placeholder instead of a real take on this deal. Set ANTHROPIC_API_KEY in backend/.env to enable it.",
     disclaimer: AI_DISCLAIMER,
   };
 }

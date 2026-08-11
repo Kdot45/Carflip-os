@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { DealLabelBadge } from "@/components/ui/Badge";
+import { AiDisclaimer } from "@/components/ui/AiDisclaimer";
 import { formatCurrency, formatPct } from "@/lib/format";
-import { api } from "@/lib/api";
-import { MaxBidResult, Project } from "@/lib/types";
+import { api, ApiRequestError } from "@/lib/api";
+import { BidCommentaryResult, MaxBidResult, Project } from "@/lib/types";
 import clsx from "@/lib/clsx";
 
 interface UpdateResponse {
@@ -31,6 +33,22 @@ export function MaxBidPanel({
     targetProfitAmount: project.targetProfitAmount !== null ? String(project.targetProfitAmount) : "",
     targetMarginPct: project.targetMarginPct !== null ? String(project.targetMarginPct) : "",
   });
+  const [aiTake, setAiTake] = useState<BidCommentaryResult | null>(null);
+  const [isLoadingTake, setIsLoadingTake] = useState(false);
+  const [takeError, setTakeError] = useState<string | null>(null);
+
+  async function getAiTake() {
+    setIsLoadingTake(true);
+    setTakeError(null);
+    try {
+      const result = await api.post<BidCommentaryResult>(`/projects/${project.id}/ai/bid-commentary`);
+      setAiTake(result);
+    } catch (err) {
+      setTakeError(err instanceof ApiRequestError ? err.message : "Couldn't get a take right now.");
+    } finally {
+      setIsLoadingTake(false);
+    }
+  }
 
   async function save() {
     const res = await api.patch<UpdateResponse>(`/projects/${project.id}`, {
@@ -125,6 +143,23 @@ export function MaxBidPanel({
       <p className="mt-3 text-center text-xs text-slate-400">
         Margin at asking price: {formatPct(maxBid?.marginAtAskingPct)}
       </p>
+
+      {hasEstimate && (
+        <div className="mt-4 border-t border-slate-100 pt-4">
+          {aiTake ? (
+            <div className="rounded-xl bg-accent-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-accent-700">AI&rsquo;s take</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{aiTake.take}</p>
+              <AiDisclaimer text={aiTake.disclaimer} />
+            </div>
+          ) : (
+            <Button variant="secondary" size="sm" onClick={getAiTake} disabled={isLoadingTake} fullWidth>
+              {isLoadingTake ? "Thinking…" : "🤖 Get AI's take on this deal"}
+            </Button>
+          )}
+          {takeError && <p className="mt-2 text-center text-xs text-bad">{takeError}</p>}
+        </div>
+      )}
     </Card>
   );
 }

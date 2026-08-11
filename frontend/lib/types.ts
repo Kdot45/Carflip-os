@@ -167,6 +167,11 @@ export interface TriageResult {
   disclaimer: string;
 }
 
+export interface BidCommentaryResult {
+  take: string;
+  disclaimer: string;
+}
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;

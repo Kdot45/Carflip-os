@@ -1,7 +1,13 @@
 # Khilco Holdings, LLC — website
 
-A single, dependency-free static page (`index.html`, styles inline) for the
-Khilco Holdings, LLC investor-facing site. No build step required.
+A standalone, dependency-free static site (`index.html` + `assets/`) for the
+Khilco Holdings, LLC homepage. No build step, no framework — plain HTML/CSS/JS.
+Lives entirely inside `holding-site/` and does not touch CarFlip OS.
+
+Design direction: near-black charcoal base, off-white type, one electric-lime
+accent used sparingly. The page is built as an arc — **pressure → clarity →
+momentum → possibility** — across four sections: Hero, Foundation, Momentum,
+Future/Contact.
 
 ## Preview locally
 
@@ -13,24 +19,37 @@ python3 -m http.server 8080
 
 ## Deploy
 
-Any static host works — drag-and-drop the `holding-site` folder into
-Netlify or Vercel, or serve it from GitHub Pages / an S3 + CloudFront
-bucket. There's no build command; the entry point is `index.html`.
+Any static host works — Netlify, Vercel, GitHub Pages, or an S3 + CloudFront
+bucket. Entry point is `index.html`; everything else lives under `assets/`.
+
+## Structure
+
+- `index.html` — markup and copy
+- `assets/styles.css` — design tokens (top of file: `:root`) and all styling
+- `assets/script.js` — scroll-reveal, header-on-scroll, and a subtle hero
+  parallax; all guarded behind `prefers-reduced-motion`
 
 ## Before this goes live, replace the placeholders
 
-Search the file for bracketed text and the dashed "Reserved for portfolio
-venture" cards, and replace with real information:
+Search for `[ add contact email ]` in `index.html` (contact panel, two
+spots — general inquiries and partnerships/investors) and fill in real
+addresses.
 
-- **Contact email** — the `[ add your contact email ]` line and the
-  `invest@khilcoholdings.com` investor address (currently a placeholder).
-- **Registered office address.**
-- **Portfolio ventures** — CarFlip OS is filled in as the one real,
-  verifiable venture. The Operations / Consumer / Service cards are empty
-  placeholders; either fill them in with real ventures or remove the cards.
-- **Stats row** in the hero (venture count, active ventures, raise year) —
-  update as those numbers change.
-- Any claims about funding stage, use of funds, or financials should be
-  reviewed against what you're actually prepared to represent to investors
-  — this is marketing copy, not a substitute for your deck, financials, or
-  legal disclosures.
+## What's real vs. placeholder in the copy
+
+- **CarFlip OS** is the one real, verifiable venture and is named directly
+  in the Momentum section.
+- The Operations / Consumer / Service cards are intentionally empty
+  ("Reserved" / "Pipeline") — no other ventures, funding, history, or
+  performance claims have been invented. Fill these in only when there's a
+  real venture to name.
+- The founder-note pull-quote in the Foundation section is the line you
+  provided; it's presented unattributed by design (no name was given to
+  sign it with). Add a name/title there if you want it signed.
+
+## Retinting / restyling
+
+All color, spacing, and font tokens are CSS custom properties at the top of
+`assets/styles.css` (`:root`). Swap `--accent` for a different accent color
+(the brief's other options were deep cobalt or warm amber) without touching
+markup.

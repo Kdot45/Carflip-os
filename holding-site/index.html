@@ -3,625 +3,225 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Khilco Holdings, LLC</title>
+<title>Khilco Holdings, LLC — Building ventures with purpose and staying power</title>
 <meta name="description" content="Khilco Holdings, LLC is a parent holding company that builds, owns, and supports a growing portfolio of technology, operations, consumer, and service ventures." />
-<style>
-  :root {
-    --navy: #0b1a2b;
-    --navy-deep: #071120;
-    --gold: #c9a24b;
-    --gold-soft: #e6cf94;
-    --ink: #1c2530;
-    --muted: #5b6b7c;
-    --paper: #f7f5f0;
-    --white: #ffffff;
-    --line: #e4e0d6;
-    --radius: 10px;
-  }
+<meta name="color-scheme" content="dark" />
+<meta name="theme-color" content="#0a0b0d" />
+<link rel="icon" type="image/png" href="favicon.png" />
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Khilco Holdings, LLC" />
+<meta property="og:description" content="Building ventures with purpose and staying power." />
+<meta name="twitter:card" content="summary" />
 
-  html { scroll-behavior: smooth; }
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    color: var(--ink);
-    background: var(--paper);
-    line-height: 1.6;
-  }
-
-  a { color: inherit; }
-
-  .wrap {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 24px;
-  }
-
-  /* ---------- Header ---------- */
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: var(--navy);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-
-  header .wrap {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 72px;
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--white);
-    text-decoration: none;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    font-size: 1.15rem;
-  }
-
-  .brand .mark {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--gold-soft), var(--gold));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--navy-deep);
-    font-weight: 800;
-    font-size: 1rem;
-  }
-
-  nav {
-    display: flex;
-    gap: 28px;
-  }
-
-  nav a {
-    color: rgba(255,255,255,0.8);
-    text-decoration: none;
-    font-size: 0.92rem;
-    font-weight: 500;
-    transition: color 0.15s ease;
-  }
-
-  nav a:hover { color: var(--gold-soft); }
-
-  .btn {
-    display: inline-block;
-    padding: 11px 22px;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 0.92rem;
-    text-decoration: none;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .btn-gold {
-    background: var(--gold);
-    color: var(--navy-deep);
-  }
-
-  .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(201,162,75,0.35); }
-
-  .btn-outline {
-    border: 1px solid rgba(255,255,255,0.35);
-    color: var(--white);
-  }
-
-  .btn-outline:hover { border-color: var(--gold-soft); color: var(--gold-soft); }
-
-  /* ---------- Hero ---------- */
-  .hero {
-    background:
-      radial-gradient(1200px 480px at 15% -10%, rgba(201,162,75,0.18), transparent 60%),
-      linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
-    color: var(--white);
-    padding: 110px 0 130px;
-  }
-
-  .eyebrow {
-    display: inline-block;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: var(--gold-soft);
-    border: 1px solid rgba(230,207,148,0.35);
-    padding: 6px 14px;
-    border-radius: 999px;
-    margin-bottom: 26px;
-  }
-
-  .hero h1 {
-    font-size: clamp(2.2rem, 4.4vw, 3.4rem);
-    font-weight: 700;
-    max-width: 780px;
-    letter-spacing: -0.01em;
-  }
-
-  .hero p.lead {
-    margin-top: 22px;
-    max-width: 640px;
-    font-size: 1.12rem;
-    color: rgba(255,255,255,0.78);
-  }
-
-  .hero .actions {
-    margin-top: 38px;
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .stat-row {
-    margin-top: 72px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    max-width: 720px;
-  }
-
-  .stat-row .stat {
-    border-top: 1px solid rgba(255,255,255,0.15);
-    padding-top: 14px;
-  }
-
-  .stat .num {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--gold-soft);
-  }
-
-  .stat .label {
-    font-size: 0.82rem;
-    color: rgba(255,255,255,0.6);
-    margin-top: 4px;
-  }
-
-  /* ---------- Sections ---------- */
-  section { padding: 90px 0; }
-
-  .section-head {
-    max-width: 620px;
-    margin-bottom: 52px;
-  }
-
-  .section-head .eyebrow-dark {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: #9a7f2f;
-  }
-
-  .section-head h2 {
-    font-size: clamp(1.6rem, 3vw, 2.1rem);
-    margin-top: 12px;
-    letter-spacing: -0.01em;
-  }
-
-  .section-head p {
-    margin-top: 14px;
-    color: var(--muted);
-    font-size: 1.02rem;
-  }
-
-  /* About / model */
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: 56px;
-    align-items: start;
-  }
-
-  .about-grid p {
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
-
-  .pillars {
-    display: grid;
-    gap: 14px;
-  }
-
-  .pillar {
-    background: var(--white);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-  }
-
-  .pillar .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--gold);
-    margin-top: 8px;
-    flex-shrink: 0;
-  }
-
-  .pillar h4 { font-size: 0.98rem; margin-bottom: 4px; }
-  .pillar p { color: var(--muted); font-size: 0.9rem; margin: 0; }
-
-  /* Portfolio */
-  .portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 22px;
-  }
-
-  .card {
-    background: var(--white);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 28px;
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
-  }
-
-  .card:hover { box-shadow: 0 12px 28px rgba(11,26,43,0.08); transform: translateY(-2px); }
-
-  .card .tag {
-    display: inline-block;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #9a7f2f;
-    background: #f4ecd8;
-    padding: 4px 10px;
-    border-radius: 999px;
-    margin-bottom: 14px;
-  }
-
-  .card.placeholder .tag {
-    color: var(--muted);
-    background: #eef0f2;
-  }
-
-  .card h3 {
-    font-size: 1.15rem;
-    margin-bottom: 8px;
-  }
-
-  .card p {
-    color: var(--muted);
-    font-size: 0.95rem;
-  }
-
-  .card .status {
-    margin-top: 16px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--navy);
-  }
-
-  .card.placeholder {
-    border-style: dashed;
-  }
-
-  .card.placeholder .status { color: var(--muted); }
-
-  /* Approach */
-  .approach-list {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-  }
-
-  .approach-item .num {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--gold);
-    margin-bottom: 10px;
-  }
-
-  .approach-item h4 { font-size: 1rem; margin-bottom: 8px; }
-  .approach-item p { color: var(--muted); font-size: 0.9rem; }
-
-  /* Investor / CTA */
-  .cta {
-    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
-    color: var(--white);
-    border-radius: 18px;
-    padding: 64px 56px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 40px;
-    flex-wrap: wrap;
-  }
-
-  .cta h2 { font-size: 1.7rem; max-width: 460px; }
-  .cta p { margin-top: 12px; color: rgba(255,255,255,0.7); max-width: 460px; }
-
-  .cta .actions { display: flex; gap: 14px; flex-wrap: wrap; }
-
-  .note {
-    margin-top: 18px;
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.55);
-  }
-
-  /* Contact */
-  .contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-  }
-
-  .contact-item {
-    border-top: 1px solid var(--line);
-    padding-top: 16px;
-  }
-
-  .contact-item .label {
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .contact-item .value { font-weight: 600; }
-  .placeholder-text { color: #b18a1f; font-style: italic; font-weight: 500; }
-
-  footer {
-    background: var(--navy-deep);
-    color: rgba(255,255,255,0.55);
-    padding: 40px 0;
-    font-size: 0.85rem;
-  }
-
-  footer .wrap {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  @media (max-width: 860px) {
-    nav { display: none; }
-    .about-grid, .portfolio-grid, .contact-grid { grid-template-columns: 1fr; }
-    .approach-list { grid-template-columns: repeat(2, 1fr); }
-    .stat-row { grid-template-columns: repeat(3, 1fr); }
-    .cta { padding: 44px 28px; }
-  }
-
-  @media (max-width: 520px) {
-    .approach-list { grid-template-columns: 1fr; }
-    .hero { padding: 84px 0 90px; }
-  }
-</style>
+<link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
 
-<header>
-  <div class="wrap">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="container">
     <a class="brand" href="#top">
-      <span class="mark">K</span>
+      <span class="mark" aria-hidden="true">K</span>
       Khilco Holdings
     </a>
-    <nav>
-      <a href="#about">About</a>
-      <a href="#portfolio">Portfolio</a>
-      <a href="#approach">Approach</a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#foundation">Foundation</a>
+      <a href="#momentum">Momentum</a>
+      <a href="#future">Future</a>
       <a href="#contact">Contact</a>
     </nav>
-    <a class="btn btn-gold" href="#contact">Investor Inquiries</a>
+    <a class="btn btn-primary btn-small" href="#contact">Start a Conversation</a>
   </div>
 </header>
 
-<section class="hero" id="top">
-  <div class="wrap">
-    <span class="eyebrow">Khilco Holdings, LLC</span>
-    <h1>Building and backing the ventures inside our portfolio.</h1>
-    <p class="lead">
-      Khilco Holdings, LLC is a parent holding company that builds, owns, and
-      supports a growing portfolio of technology, operations, consumer, and
-      service ventures.
-    </p>
-    <div class="actions">
-      <a class="btn btn-gold" href="#contact">Request Investor Deck</a>
-      <a class="btn btn-outline" href="#portfolio">View Portfolio</a>
-    </div>
+<main id="main">
 
-    <div class="stat-row">
-      <div class="stat">
-        <div class="num">4</div>
-        <div class="label">Venture categories</div>
-      </div>
-      <div class="stat">
-        <div class="num">1+</div>
-        <div class="label">Active operating venture</div>
-      </div>
-      <div class="stat">
-        <div class="num">2026</div>
-        <div class="label">Actively raising capital</div>
-      </div>
-    </div>
-  </div>
-</section>
+  <!-- ======================= HERO — Pressure ======================= -->
+  <section class="hero" id="top">
+    <div class="hero-atmosphere" aria-hidden="true"></div>
 
-<section id="about">
-  <div class="wrap">
-    <div class="about-grid">
-      <div>
-        <span class="eyebrow-dark">About Khilco Holdings</span>
-        <h2 style="margin-top:12px;">A holding company built to launch, own, and scale operating businesses</h2>
-        <p>
-          Khilco Holdings, LLC sits above our portfolio of operating companies.
-          Rather than running a single product line, we identify, build, and
-          support ventures across technology, operations, consumer, and
-          service categories — providing shared infrastructure, capital
-          allocation, and operating discipline so each venture can focus on
-          its own market.
+    <svg class="hero-lines" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+      <path d="M-50,620 C 250,540 450,700 700,560 S 1100,480 1260,540" />
+      <path d="M-50,180 C 200,260 500,120 760,220 S 1150,300 1260,220" />
+      <path class="live" d="M-50,420 C 280,360 520,480 820,380 S 1180,340 1260,400" />
+    </svg>
+
+    <div class="container">
+      <div class="hero-content">
+        <p class="eyebrow">Khilco Holdings, LLC</p>
+        <h1 data-reveal>Building ventures with <span class="accent">purpose</span> and staying power.</h1>
+        <p class="lead" data-reveal>
+          Khilco Holdings, LLC is a parent holding company that builds, owns,
+          and supports a growing portfolio of technology, operations,
+          consumer, and service ventures.
         </p>
-        <p>
-          We are early-stage and self-funded to date. We're now raising
-          growth capital to accelerate our first operating venture and fund
-          the next additions to the portfolio.
-        </p>
-      </div>
-      <div class="pillars">
-        <div class="pillar">
-          <span class="dot"></span>
-          <div>
-            <h4>Build</h4>
-            <p>We incubate new ventures from the ground up when we see a gap worth building for.</p>
-          </div>
-        </div>
-        <div class="pillar">
-          <span class="dot"></span>
-          <div>
-            <h4>Own</h4>
-            <p>We take direct, long-term ownership stakes rather than passive minority positions.</p>
-          </div>
-        </div>
-        <div class="pillar">
-          <span class="dot"></span>
-          <div>
-            <h4>Support</h4>
-            <p>Portfolio companies share back-office, technical, and operating resources through the holding company.</p>
-          </div>
+        <div class="actions" data-reveal>
+          <a class="btn btn-primary" href="#foundation">Explore Khilco</a>
+          <a class="btn btn-ghost" href="#contact">Start a Conversation</a>
         </div>
       </div>
     </div>
-  </div>
-</section>
 
-<section id="portfolio" style="background:var(--white); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow-dark">Portfolio</span>
-      <h2>What we own and where we're expanding</h2>
-      <p>Our first operating venture is live. Additional categories are reserved for near-term expansion as we deploy new capital.</p>
+    <div class="scroll-cue" aria-hidden="true">
+      <span class="line"></span>
+      Scroll
     </div>
-    <div class="portfolio-grid">
-      <div class="card">
-        <span class="tag">Technology</span>
-        <h3>CarFlip OS</h3>
-        <p>
-          A software platform that helps individual car flippers and small
-          dealers evaluate private-party deals, estimate repair costs, and
-          protect their margin before they buy.
+  </section>
+
+  <!-- ======================= FOUNDATION — Clarity ======================= -->
+  <section class="foundation" id="foundation">
+    <div class="container">
+      <div class="foundation-grid">
+        <div data-reveal>
+          <p class="section-label"><span class="index">01</span>Foundation</p>
+          <h2>Built from real work, not theory.</h2>
+        </div>
+
+        <div>
+          <div class="foundation-copy">
+            <p data-reveal>
+              Khilco is built on a simple premise: take ownership seriously.
+              Not the paperwork kind — the kind that comes from doing the
+              work long enough to understand what a business actually needs
+              to hold up over time.
+            </p>
+            <p data-reveal>
+              That means disciplined execution over quick wins. Practical
+              usefulness over noise. Building systems that don't need to be
+              rebuilt in a year because they were done right the first time.
+            </p>
+            <p data-reveal>
+              Progress here is measured in foundations, not headlines —
+              the unglamorous work that makes the next stage possible.
+            </p>
+          </div>
+
+          <blockquote class="founder-note" data-reveal>
+            “A builder with a clear vision, real-world experience, and the
+            patience to create businesses that last.”
+            <span class="role">The approach behind Khilco</span>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= MOMENTUM — what Khilco holds ======================= -->
+  <section class="momentum" id="momentum">
+    <div class="container">
+      <div class="momentum-head">
+        <p class="section-label"><span class="index">02</span>Momentum</p>
+        <h2 data-reveal>A growing portfolio. Built deliberately.</h2>
+        <p data-reveal>
+          Selected ventures and operating brands will be introduced as they
+          are ready. Each one draws on the same shared foundation —
+          technology, operating discipline, and long-term ownership.
         </p>
-        <div class="status">Status: Active — in build</div>
       </div>
-      <div class="card placeholder">
-        <span class="tag">Operations</span>
-        <h3>Reserved for portfolio venture</h3>
-        <p>Space allocated for our next operations-focused acquisition or build.</p>
-        <div class="status">Status: Pipeline</div>
-      </div>
-      <div class="card placeholder">
-        <span class="tag">Consumer</span>
-        <h3>Reserved for portfolio venture</h3>
-        <p>Space allocated for our next consumer-facing acquisition or build.</p>
-        <div class="status">Status: Pipeline</div>
-      </div>
-      <div class="card placeholder">
-        <span class="tag">Service</span>
-        <h3>Reserved for portfolio venture</h3>
-        <p>Space allocated for our next service-based acquisition or build.</p>
-        <div class="status">Status: Pipeline</div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<section id="approach">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow-dark">Approach</span>
-      <h2>How we evaluate and grow a venture</h2>
-    </div>
-    <div class="approach-list">
-      <div class="approach-item">
-        <div class="num">01</div>
-        <h4>Identify</h4>
-        <p>We look for underserved, practical problems in overlooked markets.</p>
-      </div>
-      <div class="approach-item">
-        <div class="num">02</div>
-        <h4>Build or acquire</h4>
-        <p>We stand up new ventures internally or take ownership of existing small operators.</p>
-      </div>
-      <div class="approach-item">
-        <div class="num">03</div>
-        <h4>Support</h4>
-        <p>Each venture draws on shared technology, finance, and operating resources from the holding company.</p>
-      </div>
-      <div class="approach-item">
-        <div class="num">04</div>
-        <h4>Scale</h4>
-        <p>Capital and attention concentrate on the ventures that prove out demand.</p>
-      </div>
-    </div>
-  </div>
-</section>
+      <svg class="system-graphic" data-reveal viewBox="0 0 1160 320" role="img" aria-label="Diagram showing Khilco Holdings at the center, connected to four venture categories: technology, operations, consumer, and service." focusable="false">
+        <path class="node-line active" d="M580,58 Q 300,160 140,255" />
+        <path class="node-line" d="M580,58 Q 500,160 430,255" />
+        <path class="node-line" d="M580,58 Q 660,160 730,255" />
+        <path class="node-line" d="M580,58 Q 850,160 1020,255" />
 
-<section id="invest" style="padding-top:0;">
-  <div class="wrap">
-    <div class="cta">
-      <div>
-        <h2>Raising capital to grow our first portfolio venture</h2>
-        <p>
-          Khilco Holdings is pre-revenue at the holding company level and is
-          currently raising growth capital. We'll share our deck, venture
-          roadmap, and use of funds on request.
-        </p>
-        <p class="note">Materials shared under a mutual NDA on request.</p>
-      </div>
-      <div class="actions">
-        <a class="btn btn-gold" href="mailto:invest@khilcoholdings.com?subject=Investor%20Inquiry%20-%20Khilco%20Holdings">Email Investor Relations</a>
-      </div>
-    </div>
-  </div>
-</section>
+        <circle class="node active" cx="580" cy="52" r="9" />
+        <text class="active" x="580" y="24" text-anchor="middle">Khilco</text>
 
-<section id="contact">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow-dark">Contact</span>
-      <h2>Get in touch</h2>
-    </div>
-    <div class="contact-grid">
-      <div class="contact-item">
-        <div class="label">General inquiries</div>
-        <div class="value placeholder-text">[ add your contact email ]</div>
-      </div>
-      <div class="contact-item">
-        <div class="label">Investor relations</div>
-        <div class="value">invest@khilcoholdings.com <span class="placeholder-text">(placeholder — replace with your real address)</span></div>
-      </div>
-      <div class="contact-item">
-        <div class="label">Registered office</div>
-        <div class="value placeholder-text">[ add registered business address ]</div>
-      </div>
-      <div class="contact-item">
-        <div class="label">Entity</div>
-        <div class="value">Khilco Holdings, LLC</div>
-      </div>
-    </div>
-  </div>
-</section>
+        <circle class="node active" cx="140" cy="262" r="7" />
+        <text class="active" x="140" y="292" text-anchor="middle">Technology</text>
 
-<footer>
-  <div class="wrap">
+        <circle class="node" cx="430" cy="262" r="7" />
+        <text x="430" y="292" text-anchor="middle">Operations</text>
+
+        <circle class="node" cx="730" cy="262" r="7" />
+        <text x="730" y="292" text-anchor="middle">Consumer</text>
+
+        <circle class="node" cx="1020" cy="262" r="7" />
+        <text x="1020" y="292" text-anchor="middle">Service</text>
+      </svg>
+
+      <div class="portfolio-grid">
+        <article class="venture-card is-active" data-reveal>
+          <span class="tag">Technology</span>
+          <h3>CarFlip OS</h3>
+          <p>A platform that helps individual car flippers and small dealers evaluate deals and protect their margin before they buy.</p>
+          <p class="status">In build</p>
+        </article>
+
+        <article class="venture-card" data-reveal>
+          <span class="tag">Operations</span>
+          <h3>Reserved</h3>
+          <p>Introduced as it's ready.</p>
+          <p class="status">Pipeline</p>
+        </article>
+
+        <article class="venture-card" data-reveal>
+          <span class="tag">Consumer</span>
+          <h3>Reserved</h3>
+          <p>Introduced as it's ready.</p>
+          <p class="status">Pipeline</p>
+        </article>
+
+        <article class="venture-card" data-reveal>
+          <span class="tag">Service</span>
+          <h3>Reserved</h3>
+          <p>Introduced as it's ready.</p>
+          <p class="status">Pipeline</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= FUTURE — Possibility + Contact ======================= -->
+  <section class="future" id="future">
+    <div class="container">
+      <p class="section-label"><span class="index">03</span>Future</p>
+      <h2 data-reveal>Built for what comes next.</h2>
+      <p class="lead" data-reveal>
+        Khilco partners with builders, operators, and collaborators who want
+        to create practical, durable value.
+      </p>
+      <div class="actions" data-reveal>
+        <a class="btn btn-primary" href="#contact">Start a Conversation</a>
+      </div>
+
+      <div class="contact-panel" id="contact">
+        <div class="contact-item" data-reveal>
+          <p class="label">General inquiries</p>
+          <p class="value"><span class="needs-input">[ add contact email ]</span></p>
+        </div>
+        <div class="contact-item" data-reveal>
+          <p class="label">Partnerships &amp; investors</p>
+          <p class="value"><span class="needs-input">[ add contact email ]</span></p>
+        </div>
+        <div class="contact-item" data-reveal>
+          <p class="label">Entity</p>
+          <p class="value">Khilco Holdings, LLC</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <a class="brand" href="#top">
+      <span class="mark" aria-hidden="true">K</span>
+      Khilco Holdings, LLC
+    </a>
     <span>&copy; 2026 Khilco Holdings, LLC. All rights reserved.</span>
-    <span>This site does not constitute an offer to sell securities.</span>
   </div>
 </footer>
 
+<script src="assets/script.js"></script>
 </body>
 </html>

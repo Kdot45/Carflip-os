@@ -29,11 +29,12 @@ bucket. Entry point is `index.html`; everything else lives under `assets/`.
 - `assets/script.js` — scroll-reveal, header-on-scroll, and a subtle hero
   parallax; all guarded behind `prefers-reduced-motion`
 
-## Before this goes live, replace the placeholders
+## Before this goes live
 
-Search for `[ add contact email ]` in `index.html` (contact panel, two
-spots — general inquiries and partnerships/investors) and fill in real
-addresses.
+Both contact-panel emails currently point to `kavidharris@khilco.com`
+(general inquiries and partnerships/investors share the one address given
+so far). If you want a separate investor-relations inbox later, split the
+second `mailto:` link in `index.html`'s `#contact` panel.
 
 ## What's real vs. placeholder in the copy
 
